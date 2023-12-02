@@ -1,16 +1,17 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { defineRestApi } from './apiGateway/mainRestApi';
+import { defineApiGatewayTodo } from './apiGateway/todos';
+import { buildRoutes } from './apiGateway/routes';
 
 export class GatewaySampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const restApi = defineRestApi(this)
+    const router = buildRoutes(restApi)
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'GatewaySampleQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    defineApiGatewayTodo(this, router)
   }
 }
