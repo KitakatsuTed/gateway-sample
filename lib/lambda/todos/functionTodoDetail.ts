@@ -1,14 +1,15 @@
 import { Construct } from "constructs";
-import { Function, AssetCode } from 'aws-cdk-lib/aws-lambda';
 import { resourceNameTodo } from '../../apiGateway/todos';
 import { defaultOptions } from '../shared/defaultOptions';
+import path from "path";
+import * as cdk from 'aws-cdk-lib';
 
 export const functionTodoDetail = (scope: Construct) => {
   const functionNameTodoDetail = `${resourceNameTodo}Detail`
 
-  return new Function(scope, functionNameTodoDetail, {
+  return new cdk.aws_lambda_nodejs.NodejsFunction(scope, functionNameTodoDetail, {
+    ...defaultOptions(),
     functionName: functionNameTodoDetail,
-    code: new AssetCode(`./src/functions/todos/detail`),
-    ...defaultOptions()
+    entry: path.join(__dirname, '../../../src/functions/todos/detail/handler.ts')
   });
 }

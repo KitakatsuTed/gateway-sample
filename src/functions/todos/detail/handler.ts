@@ -9,7 +9,7 @@ export const handler = async function (event: any, context: any) {
   return {
     statusCode: 200,
     headers: {},
-    body: todo
+    body: JSON.stringify(todo)
   };
 };
 // https://qiita.com/tokkun5552/items/9e5cf5ebc817cbd4602e

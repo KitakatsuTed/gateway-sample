@@ -1,13 +1,14 @@
 import { Construct } from "constructs";
-import { Function, AssetCode } from 'aws-cdk-lib/aws-lambda';
 import { resourceNameTodo } from '../../apiGateway/todos';
 import { defaultOptions } from '../shared/defaultOptions';
+import * as cdk from 'aws-cdk-lib';
+import path from "path";
 export const functionTodoIndex = (scope: Construct) => {
   const functionNameTodoIndex = `${resourceNameTodo}Index`
   
-  return new Function(scope, functionNameTodoIndex, {
+  return new cdk.aws_lambda_nodejs.NodejsFunction(scope, functionNameTodoIndex, {
+    ...defaultOptions(),
     functionName: functionNameTodoIndex,
-    code: new AssetCode(`./src/functions/todos/index`),
-    ...defaultOptions()
+    entry: path.join(__dirname, '../../../src/functions/todos/index/handler.ts')
   });
 }

@@ -1,12 +1,19 @@
-import { FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda"
+import { Runtime } from "aws-cdk-lib/aws-lambda"
 import * as cdk from 'aws-cdk-lib';
+import path from "path";
 
-export const defaultOptions = (args?: FunctionProps) => {
+export const defaultOptions = () => {
   return {
-    handler: "handler.handler",
+    handler: "index.handler",
     runtime: Runtime.NODEJS_20_X,
     memorySize: 512,
     timeout: cdk.Duration.seconds(10),
-    ...{args}
+    bundling: {
+      minify: true,
+      sourceMap: true,
+      externalModules: ["@aws-sdk/*"],
+      tsconfig: path.join(__dirname, "../../tsconfig.json"),
+      format: cdk.aws_lambda_nodejs.OutputFormat.ESM,
+    },
   }
 }
