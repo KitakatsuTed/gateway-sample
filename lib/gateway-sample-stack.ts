@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 import { restApi } from './apiGateway/restApi';
 import { defineApiGatewayTodo } from './apiGateway/todos';
 import { buildRoutes } from './apiGateway/routes';
+import { dynamoTables } from './dynamoDB';
 
 export class GatewaySampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -13,5 +14,6 @@ export class GatewaySampleStack extends cdk.Stack {
     const router = buildRoutes(restApiObj)
 
     defineApiGatewayTodo(this, router)
+    dynamoTables(this)
   }
 }

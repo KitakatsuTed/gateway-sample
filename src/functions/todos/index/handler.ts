@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { Todo } from "../../../lib/models/todo";
+import { Todo } from "../../../lib/entities/todo";
 
 export const handler = async function (event: any, context: any) {
   const todos: Todo[] = [

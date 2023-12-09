@@ -26,7 +26,10 @@
     "@aws-cdk/aws-iam": "^1.204.0",
     "@aws-cdk/aws-lambda": "^1.204.0",
     "@aws-cdk/aws-ssm": "^1.204.0",
+    "@aws-sdk/client-dynamodb": "^3.465.0",
+    "@aws-sdk/types": "^3.468.0",
     "aws-cdk-lib": "2.111.0",
+    "aws-sdk": "^2.1514.0",
     "constructs": "^10.0.0",
     "luxon": "^3.4.4",
     "source-map-support": "^0.5.21"

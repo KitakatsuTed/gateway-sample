@@ -1,6 +1,6 @@
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
-import { functionTodoDetail, functionTodoIndex } from '../../lambda/todos';
+import { functionTodoDetail, functionTodoIndex } from '../../todos';
 import { RouteMapping } from '../routes';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -12,7 +12,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
     'GET',
     new LambdaIntegration(functionTodoIndex(scope))
   );
-  
+
   route.apiTodo.addMethod(
     'GET',
     new LambdaIntegration(functionTodoDetail(scope))
