@@ -54,4 +54,17 @@ export abstract class ConditionBase {
     ExpressionAttributeNames?: AWS.DynamoDB.DocumentClient.ExpressionAttributeNameMap;
     ExpressionAttributeValues?: AWS.DynamoDB.DocumentClient.ExpressionAttributeValueMap;
   };
+
+  deleteItemInput?: {
+    Key: AWS.DynamoDB.DocumentClient.Key;
+    Expected?: AWS.DynamoDB.DocumentClient.ExpectedAttributeMap;
+    ConditionalOperator?: AWS.DynamoDB.DocumentClient.ConditionalOperator;
+    ReturnValues?: AWS.DynamoDB.DocumentClient.ReturnValue;
+    ReturnConsumedCapacity?: AWS.DynamoDB.DocumentClient.ReturnConsumedCapacity;
+    ReturnItemCollectionMetrics?: AWS.DynamoDB.DocumentClient.ReturnItemCollectionMetrics;
+    ConditionExpression?: AWS.DynamoDB.DocumentClient.ConditionExpression;
+    ExpressionAttributeNames?: AWS.DynamoDB.DocumentClient.ExpressionAttributeNameMap;
+    ExpressionAttributeValues?: AWS.DynamoDB.DocumentClient.ExpressionAttributeValueMap;
+    ReturnValuesOnConditionCheckFailure?: AWS.DynamoDB.DocumentClient.ReturnValuesOnConditionCheckFailure;
+  }
 }

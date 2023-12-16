@@ -1,12 +1,12 @@
 import * as AWS from 'aws-sdk';
-import { IEntityBase } from '../entities/entityBase';
+import { EntityBase } from '../../entities/entityBase';
 import { CollectionBase } from '../collections/collectionBase';
 import { ConditionBase } from '../conditions/conditionBase';
-import * as Exceptions from '../exceptions/argumentNullExceptions';
+import * as Exceptions from '../../exceptions/argumentNullExceptions';
 
 export interface IRepositoryBase<
   TCondition extends ConditionBase,
-  TEntity extends IEntityBase,
+  TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>
 > {
   getAsync(condition: TCondition): Promise<TEntity | undefined>;
@@ -14,11 +14,12 @@ export interface IRepositoryBase<
   queryAllAsync(condition: TCondition): Promise<TCollection>;
   putAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput>;
   updateAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput>;
+  deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>
 }
 
 export abstract class RepositoryBase<
   TCondition extends ConditionBase,
-  TEntity extends IEntityBase,
+  TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>
 > implements IRepositoryBase<ConditionBase, TEntity, TCollection> {
   /**
@@ -55,8 +56,12 @@ export abstract class RepositoryBase<
       Key: condition.getItemInput.Key
     };
 
+    
     // コピー
     Object.assign(params, condition.getItemInput);
+    
+    // 発行するクエリをログに出す
+    console.log(params);
 
     // データ取得
     const output = await this.dbContext.get(params).promise();
@@ -73,6 +78,9 @@ export abstract class RepositoryBase<
   public async queryAsync(condition: TCondition): Promise<TCollection> {
     // DynamoDB queryパラメータ設定
     const params: AWS.DynamoDB.DocumentClient.QueryInput = this.createQueryParameters(condition);
+
+    // 発行するクエリをログに出す
+    console.log(params);
 
     // データ取得
     const output = await this.dbContext.query(params).promise();
@@ -110,6 +118,9 @@ export abstract class RepositoryBase<
   public async queryAllAsync(condition: TCondition): Promise<TCollection> {
     // DynamoDB getItemパラメータ設定
     const params: AWS.DynamoDB.DocumentClient.QueryInput = this.createQueryParameters(condition);
+
+    // 発行するクエリをログに出す
+    console.log(params);
 
     // コレクション
     const collection = this.createCollection();
@@ -171,6 +182,8 @@ export abstract class RepositoryBase<
     // パラメータコピー
     Object.assign(params, condition.putItemInput);
 
+    // 発行するクエリをログに出す
+    console.log(params);
     // データ追加
     return this.dbContext.put(params).promise();
   }
@@ -194,8 +207,37 @@ export abstract class RepositoryBase<
     // パラメータコピー
     Object.assign(params, condition.updateItemInput);
 
+    // 発行するクエリをログに出す
+    console.log(params);
+
     // 更新
     return this.dbContext.update(params).promise();
+  }
+
+  /**
+   * 削除
+   * @param condition パラメータ
+   * @returns 実行結果
+   */
+  public async deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
+    if (condition.deleteItemInput === undefined) {
+      throw new Exceptions.ArgumentNullException('condition');
+    }
+
+    // DynamoDB deleteItemパラメータ設定
+    const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
+      TableName: this.tableName,
+      Key: condition.deleteItemInput.Key
+    };
+
+    // パラメータコピー
+    Object.assign(params, condition.updateItemInput);
+
+    // 発行するクエリをログに出す
+    console.log(params);
+
+    // 削除
+    return this.dbContext.delete(params).promise();
   }
 
   /**

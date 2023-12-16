@@ -1,11 +1,11 @@
-import { IEntityBase } from '../entities/entityBase';
+import { EntityBase } from '../../entities/entityBase';
 import { CollectionBase } from '../collections/collectionBase';
 import { RepositoryBase } from '../repositories/repositoryBase';
 import { ConditionBase } from '../conditions/conditionBase';
 
 export abstract class ServiceBase<
   TCondition extends ConditionBase,
-  TEntity extends IEntityBase,
+  TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>,
   TRepository extends RepositoryBase<TCondition, TEntity, TCollection>
 > {
