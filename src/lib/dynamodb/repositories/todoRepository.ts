@@ -3,9 +3,10 @@ import { RepositoryBase } from './repositoryBase';
 import { TodoCondition as Condition } from '../conditions/todoCondition';
 import { Todo as Entity, ITodo as IEntity, Status } from '../../entities/todo';
 import { TodoCollection as Collection } from '../collections/todoCollection';
+import { TODOS_TABLE_NAME } from '../../../../lib/dynamoDB/todosTable';
 
 export class TodoRepository extends RepositoryBase<Condition, Entity, Collection> {
-  protected tableName: string = 'todos';
+  protected tableName: string = TODOS_TABLE_NAME;
 
   protected getEntity(item?: AWS.DynamoDB.DocumentClient.AttributeMap): Entity | undefined {
     if (item === undefined) {
