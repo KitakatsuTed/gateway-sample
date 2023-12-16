@@ -1,6 +1,6 @@
 // https://blog.serverworks.co.jp/dynamodb-cheatsheet
 export interface IEntityBase {
-  id: string;
+  id: string | undefined;
   createdAt?: number;
   updatedAt?: number;
 }
@@ -12,9 +12,12 @@ export abstract class EntityBase {
   public errors: Error[]
 
   constructor(
-    public createdAt?: number, 
-    public updatedAt?: number,
+    public id: string | undefined,
+    public createdAt: number | undefined, 
+    public updatedAt: number | undefined,
   ) {
     this.errors = []
   }
+
+  abstract validate(): boolean;
 }
