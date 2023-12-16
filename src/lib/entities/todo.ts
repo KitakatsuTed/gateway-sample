@@ -1,9 +1,4 @@
-import { TodoRepository } from "../dynamodb/repositories/todoRepository";
 import { IEntityBase, EntityBase } from "./entityBase";
-import { dynamodbClient as dbContext } from "../clients/dynamodb"
-import { TodoCondition } from "../dynamodb/conditions/todoCondition";
-import { getClassProperties } from "../utility/getClassProperties";
-import * as AWS from 'aws-sdk';
 
 export type Status = 'incomplete' | 'done'
 
@@ -16,7 +11,7 @@ export interface ITodo extends IEntityBase {
 
 export class Todo extends EntityBase implements ITodo {
   constructor(
-    public id: string,
+    public id: string | undefined,
     public status: Status,
     public createdAt: number | undefined,
     public updatedAt: number | undefined,

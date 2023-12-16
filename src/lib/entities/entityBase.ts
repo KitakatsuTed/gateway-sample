@@ -20,4 +20,8 @@ export abstract class EntityBase {
   }
 
   abstract validate(): boolean;
+
+  idPersisted(): boolean {
+    return !!this.id
+  }
 }

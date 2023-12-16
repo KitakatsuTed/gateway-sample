@@ -17,6 +17,8 @@ export interface IRepositoryBase<
   deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>
 }
 
+const SEQUENCE_TABLE_NAME = 'sequence' as const 
+
 export abstract class RepositoryBase<
   TCondition extends ConditionBase,
   TEntity extends EntityBase,
@@ -56,10 +58,10 @@ export abstract class RepositoryBase<
       Key: condition.getItemInput.Key
     };
 
-    
+
     // コピー
     Object.assign(params, condition.getItemInput);
-    
+
     // 発行するクエリをログに出す
     console.log(params);
 
@@ -179,6 +181,10 @@ export abstract class RepositoryBase<
       Item: condition.putItemInput.Item
     };
 
+    const newId = await this.getNewSequence();
+
+    params.Item = { ...params.Item, id: newId }
+
     // パラメータコピー
     Object.assign(params, condition.putItemInput);
 
@@ -273,5 +279,27 @@ export abstract class RepositoryBase<
     Object.assign(params, condition.queryInput);
 
     return params;
+  }
+
+  // 最新のシークエンス値を取得
+  // 各テーブルの最新のid値を採番する
+  // 若干雑な実装な気がするが一旦これで
+  private async getNewSequence(): Promise<number> {
+    const params = {
+      TableName: SEQUENCE_TABLE_NAME,
+      Key: {name: this.tableName},
+      updateItemInput: {
+        UpdateExpression: "set currentNumber = currentNumber + :val",
+        ExpressionAttributeValues: {
+          ":val": 1
+        },
+        ReturnValues: "UPDATED_NEW"
+      }
+    };
+
+    const id = await this.dbContext.update(params).promise()
+    if(id.Attributes?.currentNumber === undefined) { throw '最新のid取得に失敗しました。' }
+
+    return Number(id.Attributes?.currentNumber);
   }
 }
