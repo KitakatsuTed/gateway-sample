@@ -10,7 +10,7 @@ export abstract class ServiceBase<
   TRepository extends RepositoryBase<TCondition, TEntity, TCollection>
 > {
 
-  protected repository: TRepository;
+  public repository: TRepository;
 
   constructor(repository: TRepository) {
     this.repository = repository;

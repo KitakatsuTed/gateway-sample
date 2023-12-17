@@ -15,6 +15,14 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
 
   route.apiTodo.addMethod(
     'GET',
-    new LambdaIntegration(functionTodoDetail(scope))
+    new LambdaIntegration(functionTodoDetail(scope)),
+    {
+      requestParameters: {
+        'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+      },
+      requestValidatorOptions: {
+        validateRequestParameters: true,
+      },
+    }
   );
 }

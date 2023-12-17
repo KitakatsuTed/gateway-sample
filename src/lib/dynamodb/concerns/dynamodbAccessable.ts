@@ -4,9 +4,15 @@ import { CollectionBase } from "../collections/collectionBase";
 import { RepositoryBase } from "../repositories/repositoryBase";
 import { KeyNullException } from "../../exceptions/keyNullException";
 import { getClassProperties } from "../../utility/getClassProperties";
+import { AttributeValue } from "@aws-sdk/client-dynamodb";
+import { marshall } from '@aws-sdk/util-dynamodb'
 
 
 type Constructor<T = {}> = new (...args: any[]) => T;
+
+type Item = {
+  [key: string]: AttributeValue
+}
 
 // テーブルと対になるクラスオブジェクトからDynamoDBの操作インターフェースを提供するモジュール
 // Serviceクラスにmixinして使う
@@ -17,7 +23,7 @@ export function DynamodbAccessable<
   TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>,
   TRepository extends RepositoryBase<TCondition, TEntity, TCollection>,
-  TBase extends Constructor
+  TBase extends Constructor,
 >(Base: TBase) {
   return class extends Base {
     public repository: TRepository;
@@ -27,6 +33,16 @@ export function DynamodbAccessable<
       return this.entity.validate()
     }
 
+    async findBy(key: AWS.DynamoDB.DocumentClient.Key):  Promise<TEntity | undefined> {
+      const condition = {
+        getItemInput: {
+          Key: key
+        }
+      } as TCondition
+
+      return await this.repository.getAsync(condition)
+    }
+
     async create(): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput | undefined> {
       if (!this.validate()) {
         return undefined // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
@@ -34,9 +50,7 @@ export function DynamodbAccessable<
 
       const condition = {
         putItemInput: {
-          Item: {
-            ...Object(this.getAttributes())
-          }
+          Item: this.toDynamoDbItem(this.getAttributes())
         }
       } as TCondition
 
@@ -118,6 +132,28 @@ export function DynamodbAccessable<
       }
 
       return { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues }
+    }
+
+    toDynamoDbItem<T>(t: T): Item {
+      const item = marshall(t)
+      return item
+    }
+
+    buildQueryInput(attributes: object): { ExpressionAttributeValues: Item, KeyConditionExpression: string } {
+      const exAttributes: Item = {}
+      let KeyConditionExpression: string = ''
+  
+      for (const [key, value] of Object.entries(attributes)) {
+        exAttributes[':' + key] = value
+        KeyConditionExpression.concat(`${key} = :${key}, `)
+      }
+  
+      // 最後のカンマを消す
+      KeyConditionExpression = KeyConditionExpression.replace(/, $/, '')
+
+      const ExpressionAttributeValues: Item = this.toDynamoDbItem(exAttributes)
+  
+      return { ExpressionAttributeValues, KeyConditionExpression }
     }
   };
 }

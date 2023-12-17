@@ -1,4 +1,4 @@
-import { ArgumentNullException } from './argumentNullExceptions';
+import { ArgumentNullException } from './ArgumentNullExceptions';
 
 /**
  * カスタム例外

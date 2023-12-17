@@ -1,16 +1,47 @@
-import { eventDefaultSchema } from "../../../lib/middleware/middy/eventSchema";
 import { FromSchema } from "json-schema-to-ts";
 import { middyfy } from "../../../lib/middleware/middy/middify";
 import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
 import { STATUS_CODE } from "../../../lib/http/statusCode";
+import TodoService from "../../../lib/dynamodb/services/TodoService";
+import { NotFoundException } from "../../../lib/exceptions/NotFound";
+
+export const eventSchema = {
+  type: "object",
+  properties: {
+    pathParameters:{
+      type: "object",
+      properties: {
+        id: { 
+          type: "string"
+        }
+      },
+      required: ["id"]
+    },
+    body: {}
+  },
+  required: ['pathParameters']
+} as const;
 
 // request: eventSchema.property で型付けされている。
-async function main(request: FromSchema<typeof eventDefaultSchema>): Promise<ResponseModel> {
+async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseModel> {
+  const todoService = new TodoService()
+
+  // 自前で実装したい人はgetAsyncを直接使えば良い
+  const todo = await todoService.findBy(
+    { id: request.pathParameters.id }
+  )
+
+  if (todo === undefined) {
+    throw new NotFoundException(`Couldn't find Todo with ${request.pathParameters.id}`)
+  } 
+
   return {
     statusCode: STATUS_CODE.OK,
-    body: {},
+    body: {
+      data: todo
+    },
   }
 }
 
 // これがexportされるhandler
-export const handler = middyfy({ eventSchema: eventDefaultSchema, handler: main })
+export const handler = middyfy({ eventSchema: eventSchema, handler: main })

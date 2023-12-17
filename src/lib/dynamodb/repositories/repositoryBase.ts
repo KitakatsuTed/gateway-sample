@@ -2,7 +2,7 @@ import * as AWS from 'aws-sdk';
 import { EntityBase } from '../../entities/entityBase';
 import { CollectionBase } from '../collections/collectionBase';
 import { ConditionBase } from '../conditions/conditionBase';
-import * as Exceptions from '../../exceptions/argumentNullExceptions';
+import * as Exceptions from '../../exceptions/ArgumentNullExceptions';
 
 export interface IRepositoryBase<
   TCondition extends ConditionBase,
@@ -17,7 +17,7 @@ export interface IRepositoryBase<
   deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>
 }
 
-const SEQUENCE_TABLE_NAME = 'sequence' as const 
+const SEQUENCE_TABLE_NAME = 'sequence' as const
 
 export abstract class RepositoryBase<
   TCondition extends ConditionBase,
@@ -287,7 +287,7 @@ export abstract class RepositoryBase<
   private async getNewSequence(): Promise<number> {
     const params = {
       TableName: SEQUENCE_TABLE_NAME,
-      Key: {name: this.tableName},
+      Key: { name: this.tableName },
       updateItemInput: {
         UpdateExpression: "set currentNumber = currentNumber + :val",
         ExpressionAttributeValues: {
@@ -298,7 +298,7 @@ export abstract class RepositoryBase<
     };
 
     const id = await this.dbContext.update(params).promise()
-    if(id.Attributes?.currentNumber === undefined) { throw '最新のid取得に失敗しました。' }
+    if (id.Attributes?.currentNumber === undefined) { throw '最新のid取得に失敗しました。' }
 
     return Number(id.Attributes?.currentNumber);
   }

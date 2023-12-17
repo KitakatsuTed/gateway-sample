@@ -29,6 +29,7 @@
     "@aws-cdk/aws-ssm": "^1.204.0",
     "@aws-sdk/client-dynamodb": "^3.465.0",
     "@aws-sdk/types": "^3.468.0",
+    "@aws-sdk/util-dynamodb": "^3.474.0",
     "@middy/core": "^5.1.0",
     "@middy/http-error-handler": "^5.1.0",
     "@middy/input-output-logger": "^5.1.0",

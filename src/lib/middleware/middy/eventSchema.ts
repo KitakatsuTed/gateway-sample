@@ -1,5 +1,8 @@
 export const eventDefaultSchema = {
   type: "object",
-  properties: {},
+  properties: {
+    pathParameters: {},
+    body: {},
+  },
   required: []
 } as const;
