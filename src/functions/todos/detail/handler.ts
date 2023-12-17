@@ -1,15 +1,16 @@
-export const handler = async function (event: any, context: any) {
-  const todo = {
-    title: 'title1',
-    describe: 'describe1',
-    status: 'incomplete',
-    doneAt: undefined
-  }
+import { eventDefaultSchema } from "../../../lib/middleware/middy/eventSchema";
+import { FromSchema } from "json-schema-to-ts";
+import { middyfy } from "../../../lib/middleware/middy/middify";
+import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
+import { STATUS_CODE } from "../../../lib/http/statusCode";
 
+// request: eventSchema.property で型付けされている。
+async function main(request: FromSchema<typeof eventDefaultSchema>): Promise<ResponseModel> {
   return {
-    statusCode: 200,
-    headers: {},
-    body: JSON.stringify(todo)
-  };
-};
-// https://qiita.com/tokkun5552/items/9e5cf5ebc817cbd4602e
+    statusCode: STATUS_CODE.OK,
+    body: {},
+  }
+}
+
+// これがexportされるhandler
+export const handler = middyfy({ eventSchema: eventDefaultSchema, handler: main })
