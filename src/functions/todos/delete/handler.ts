@@ -26,6 +26,7 @@ export const eventSchema = {
 async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseModel> {
   const todoService = new TodoService()
 
+  // 自前で実装したい人はgetAsyncを直接使えば良い
   const todo = await todoService.findBy(
     { id: request.pathParameters.id }
   )
@@ -34,11 +35,11 @@ async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseMo
     throw new NotFoundException(`Couldn't find Todo with ${request.pathParameters.id}`)
   }
 
-  await todoService.delete(todo);
-
   return {
-    statusCode: STATUS_CODE.NO_CONTENT,
-    body: {},
+    statusCode: STATUS_CODE.OK,
+    body: {
+      data: todo
+    },
   }
 }
 

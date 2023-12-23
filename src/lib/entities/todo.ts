@@ -13,19 +13,19 @@ export class Todo extends EntityBase implements ITodo {
   constructor(
     public id: string | undefined,
     public status: Status,
-    public createdAt: number | undefined,
-    public updatedAt: number | undefined,
     public title?: string,
     public describe?: string,
     public doneAt?: number,
+    public createdAt?: number | undefined,
+    public updatedAt?: number | undefined,
   ) {
     super(id, createdAt, updatedAt);
     this.status = status
-    this.createdAt = createdAt
-    this.updatedAt = updatedAt
     this.title = title
     this.describe = describe
     this.doneAt = doneAt
+    this.createdAt = createdAt
+    this.updatedAt = updatedAt
   }
 
   validate() {

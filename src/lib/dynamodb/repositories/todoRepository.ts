@@ -1,7 +1,7 @@
 import * as AWS from 'aws-sdk';
 import { RepositoryBase } from './repositoryBase';
 import { TodoCondition as Condition } from '../conditions/todoCondition';
-import { Todo as Entity, ITodo as IEntity, Status } from '../../entities/todo';
+import { Todo as Entity, ITodo as IEntity } from '../../entities/todo';
 import { TodoCollection as Collection } from '../collections/todoCollection';
 import { TODOS_TABLE_NAME } from '../../../../lib/dynamoDB/todosTable';
 
@@ -27,11 +27,11 @@ export class TodoRepository extends RepositoryBase<Condition, Entity, Collection
     return new Entity(
       entity.id,
       entity.status,
-      entity.createdAt,
-      entity.updatedAt,
       entity.title,
       entity.describe,
       entity.doneAt,
+      entity.createdAt,
+      entity.updatedAt,
     );
   }
 

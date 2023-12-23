@@ -8,9 +8,9 @@ import { dynamodbClient } from '../../clients/dynamodb';
 
 // DynamodbAccessableは、pluggableな脱着可能なmixinモジュールなのでプロジェクトの途中からでも導入可能なはず
 // 気に入らなければ自前でDynamoDBとの疎通処理を作れば良い
-export default DynamodbAccessable(class TodoService extends ServiceBase<Condition, Entity, Collection, Repository> {
+export default DynamodbAccessable<Condition, Entity, Collection, Repository>(class TodoService extends ServiceBase<Condition, Entity, Collection, Repository> {
   // 毎回インスタンス作る時にRepositoryをnewするのは面倒なのでデフォルトにする
-  constructor(repository?: Repository) {
-    super(repository || new Repository(dynamodbClient))
+  constructor(client?: AWS.DynamoDB.DocumentClient) {
+    super(new Repository(client || dynamodbClient))
   }
 })

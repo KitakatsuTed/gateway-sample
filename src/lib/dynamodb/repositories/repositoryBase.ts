@@ -2,7 +2,8 @@ import * as AWS from 'aws-sdk';
 import { EntityBase } from '../../entities/entityBase';
 import { CollectionBase } from '../collections/collectionBase';
 import { ConditionBase } from '../conditions/conditionBase';
-import * as Exceptions from '../../exceptions/ArgumentNullExceptions';
+import { DateTime } from 'luxon';
+import { ArgumentNullException } from '../exceptions/ArgumentNullExceptions';
 
 export interface IRepositoryBase<
   TCondition extends ConditionBase,
@@ -49,7 +50,7 @@ export abstract class RepositoryBase<
    */
   public async getAsync(condition: TCondition): Promise<TEntity | undefined> {
     if (condition.getItemInput === undefined) {
-      throw new Exceptions.ArgumentNullException('condition');
+      throw new ArgumentNullException();
     }
 
     // パラメータ設定
@@ -172,7 +173,7 @@ export abstract class RepositoryBase<
    */
   public async putAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
     if (condition.putItemInput === undefined) {
-      throw new Exceptions.ArgumentNullException('condition');
+      throw new ArgumentNullException();
     }
 
     // DynamoDB putItemパラメータ設定
@@ -183,7 +184,12 @@ export abstract class RepositoryBase<
 
     const newId = await this.getNewSequence();
 
-    params.Item = { ...params.Item, id: newId }
+    params.Item = {
+      ...params.Item,
+      id: newId,
+      createdAt: DateTime.now().toMillis(),
+      updatedAt: DateTime.now().toMillis(),
+    }
 
     // パラメータコピー
     Object.assign(params, condition.putItemInput);
@@ -201,7 +207,7 @@ export abstract class RepositoryBase<
    */
   public async updateAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput> {
     if (condition.updateItemInput === undefined) {
-      throw new Exceptions.ArgumentNullException('condition');
+      throw new ArgumentNullException();
     }
 
     // DynamoDB putItemパラメータ設定
@@ -227,7 +233,7 @@ export abstract class RepositoryBase<
    */
   public async deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
     if (condition.deleteItemInput === undefined) {
-      throw new Exceptions.ArgumentNullException('condition');
+      throw new ArgumentNullException();
     }
 
     // DynamoDB deleteItemパラメータ設定
@@ -267,7 +273,7 @@ export abstract class RepositoryBase<
     condition: TCondition
   ): AWS.DynamoDB.DocumentClient.QueryInput {
     if (condition.queryInput === undefined) {
-      throw new Exceptions.ArgumentNullException('condition');
+      throw new ArgumentNullException();
     }
 
     // DynamoDB queryパラメータ設定

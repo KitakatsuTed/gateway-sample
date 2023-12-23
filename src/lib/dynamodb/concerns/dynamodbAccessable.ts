@@ -2,10 +2,12 @@ import { EntityBase } from "../../entities/entityBase";
 import { ConditionBase } from "../conditions/conditionBase";
 import { CollectionBase } from "../collections/collectionBase";
 import { RepositoryBase } from "../repositories/repositoryBase";
-import { KeyNullException } from "../../exceptions/keyNullException";
-import { getClassProperties } from "../../utility/getClassProperties";
+import { KeyNullException } from "../exceptions/keyNullException";
 import { AttributeValue } from "@aws-sdk/client-dynamodb";
 import { marshall } from '@aws-sdk/util-dynamodb'
+import { getAttributes } from '../../utility/getAttributes';
+import { ServiceBase } from "../services/serviceBase";
+import { DateTime } from "luxon";
 
 
 type Constructor<T = {}> = new (...args: any[]) => T;
@@ -23,17 +25,18 @@ export function DynamodbAccessable<
   TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>,
   TRepository extends RepositoryBase<TCondition, TEntity, TCollection>,
-  TBase extends Constructor,
->(Base: TBase) {
+>(Base: Constructor<
+  ServiceBase<
+    TCondition,
+    TEntity,
+    TCollection,
+    TRepository
+  >
+>) {
   return class extends Base {
     public repository: TRepository;
-    public entity: TEntity;
 
-    validate(): boolean {
-      return this.entity.validate()
-    }
-
-    async findBy(key: AWS.DynamoDB.DocumentClient.Key):  Promise<TEntity | undefined> {
+    async findBy(key: AWS.DynamoDB.DocumentClient.Key): Promise<TEntity | undefined> {
       const condition = {
         getItemInput: {
           Key: key
@@ -43,26 +46,29 @@ export function DynamodbAccessable<
       return await this.repository.getAsync(condition)
     }
 
-    async create(): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput | undefined> {
-      if (!this.validate()) {
+    async create(entity: TEntity): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput | undefined> {
+      if (!entity.validate()) {
         return undefined // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
       }
 
+      const attr = getAttributes(entity)
+      delete attr.id
+
       const condition = {
         putItemInput: {
-          Item: this.toDynamoDbItem(this.getAttributes())
+          Item: this.toDynamoDbItem(attr)
         }
       } as TCondition
 
       return await this.repository.putAsync(condition)
     }
 
-    async update(customCondition?: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput | undefined> {
-      if (this.entity.id === undefined) {
-        throw new KeyNullException(`idがセットされていません。`)
+    async update(entity: TEntity, customCondition?: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput | undefined> {
+      if (entity.id === undefined) {
+        throw new KeyNullException('idがセットされていません。')
       }
 
-      if (!this.validate()) {
+      if (!entity.validate()) {
         return undefined // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
       }
 
@@ -71,9 +77,9 @@ export function DynamodbAccessable<
       const condition: TCondition = {
         updateItemInput: {
           Key: ({
-            id: this.entity.id,
+            id: entity.id,
           }),
-          ...this.buildDefaultUpdateQuery()
+          ...this.buildDefaultUpdateQuery(entity)
         }
       } as unknown as TCondition
 
@@ -81,17 +87,17 @@ export function DynamodbAccessable<
       return await this.repository.updateAsync(customCondition || condition)
     }
 
-    async delete(): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
+    async delete(entity: TEntity): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
       // バリデーションは基本いらないはず
 
-      if (this.entity.id === undefined) {
-        throw new KeyNullException(`idがセットされていません。`)
+      if (entity.id === undefined) {
+        throw new KeyNullException('idがセットされていません。')
       }
 
       const condition = {
         deleteItemInput: {
           Key: ({
-            id: this.entity.id,
+            id: entity.id,
           }),
         }
       } as unknown as TCondition
@@ -99,27 +105,20 @@ export function DynamodbAccessable<
       return await this.repository.deleteAsync(condition)
     }
 
-    // クラスのインスタンスのインターフェースに一致する属性値のオブジェクトを返す
-    getAttributes(): TEntity {
-      let attrs = {}
-      const propertyKeys = getClassProperties(this.entity)
-
-      propertyKeys.forEach((key) => {
-        const attr = { [key]: this.entity[key as keyof TEntity] }
-        attrs = { ...attrs, ...attr }
-      })
-
-      return attrs as TEntity
-    }
-
     // オブジェクトの現在のプロパティ値をそのまま全部使ってクエリを生成する
     // DBと同じ値だったとしても影響はないはず
     // 変更部分だけのクエリを用途ごとに実装しなくても良くなるはずなのでこれで良く、デフォルトが嫌なら自前でクエリを生成すれば良い。
-    buildDefaultUpdateQuery(): { UpdateExpression: string, ExpressionAttributeNames: AWS.DynamoDB.DocumentClient.ExpressionAttributeNameMap, ExpressionAttributeValues: AWS.DynamoDB.DocumentClient.ExpressionAttributeValueMap } {
+    buildDefaultUpdateQuery(entity: TEntity): { UpdateExpression: string, ExpressionAttributeNames: AWS.DynamoDB.DocumentClient.ExpressionAttributeNameMap, ExpressionAttributeValues: AWS.DynamoDB.DocumentClient.ExpressionAttributeValueMap } {
       'SET #attrs.#attr1 = #attr, #attrs.#attr2 = :zero REMOVE #attr'
-      const attrs = this.getAttributes()
+      const attrs = getAttributes(entity)
+
+      // id,createdAt,updatedAtはライブラリ側で制御するので実装による変更は認めない
+      delete attrs.id
+      delete attrs.createdAt
+      attrs.updatedAt = DateTime.now().toMillis()
+
       const ExpressionAttributeNames = Object.fromEntries(Object.keys(attrs).map((key) => [`#${key}`, key]))
-      const ExpressionAttributeValues = Object.fromEntries(Object.keys(attrs).map((key) => [`:${key}`, this.entity[key as keyof TEntity]]))
+      const ExpressionAttributeValues = Object.fromEntries(Object.keys(attrs).map((key) => [`:${key}`, entity[key as keyof TEntity]]))
 
       // 基本的に数が合わないことはないが合っていなければ、想定外の更新結果になるので弾いておく
       if (Object.keys(ExpressionAttributeNames).length !== Object.keys(ExpressionAttributeValues).length) {
@@ -142,18 +141,22 @@ export function DynamodbAccessable<
     buildQueryInput(attributes: object): { ExpressionAttributeValues: Item, KeyConditionExpression: string } {
       const exAttributes: Item = {}
       let KeyConditionExpression: string = ''
-  
+
       for (const [key, value] of Object.entries(attributes)) {
         exAttributes[':' + key] = value
         KeyConditionExpression.concat(`${key} = :${key}, `)
       }
-  
+
       // 最後のカンマを消す
       KeyConditionExpression = KeyConditionExpression.replace(/, $/, '')
 
       const ExpressionAttributeValues: Item = this.toDynamoDbItem(exAttributes)
-  
+
       return { ExpressionAttributeValues, KeyConditionExpression }
+    }
+
+    validate(entity: TEntity): boolean {
+      return entity.validate()
     }
   };
 }
