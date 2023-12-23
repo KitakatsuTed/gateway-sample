@@ -1,9 +1,9 @@
 import { Construct } from "constructs";
-import { resourceNameTodo } from '../apiGateway/todos';
-import { defaultOptions } from '../lambda/shared/defaultOptions';
+import { resourceNameTodo } from '../../apiGateway/todos';
+import { defaultOptions } from '../shared/defaultOptions';
 import * as cdk from 'aws-cdk-lib';
 import path from "path";
-import { iamRoles } from "../iamRole";
+import { iamRoles } from "../../iamRole";
 export const functionTodoIndex = (scope: Construct) => {
   const functionNameTodoIndex = `${resourceNameTodo}Index`
 

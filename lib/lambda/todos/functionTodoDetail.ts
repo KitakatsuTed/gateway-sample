@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
-import { resourceNameTodo } from '../apiGateway/todos';
-import { defaultOptions } from '../lambda/shared/defaultOptions';
+import { resourceNameTodo } from '../../apiGateway/todos';
+import { defaultOptions } from '../shared/defaultOptions';
 import path from "path";
 import * as cdk from 'aws-cdk-lib';
 
