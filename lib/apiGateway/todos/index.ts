@@ -30,7 +30,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
   );
 
   route.apiTodo.addMethod(
-    'GET',
+    'POST',
     new LambdaIntegration(functionTodoCreate(scope)),
     {
       requestValidatorOptions: {
@@ -40,7 +40,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
   );
 
   route.apiTodo.addMethod(
-    'GET',
+    'PATCH',
     new LambdaIntegration(functionTodoUpdate(scope)),
     {
       requestParameters: {
@@ -53,7 +53,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
   );
 
   route.apiTodo.addMethod(
-    'GET',
+    'DELETE',
     new LambdaIntegration(functionTodoDelete(scope)),
     {
       requestParameters: {
