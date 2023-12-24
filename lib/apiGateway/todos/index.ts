@@ -1,24 +1,21 @@
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
-import { functionTodoDetail, functionTodoIndex } from '../../lambda/todos';
+import { functionTodoCreate, functionTodoDelete, functionTodoDetail, functionTodoIndex, functionTodoUpdate } from '../../lambda/todos';
 import { RouteMapping } from '../routes';
-import { functionTodoDelete } from '../../lambda/todos/functionTodoDelete';
-import { functionTodoCreate } from '../../lambda/todos/functionTodoCreate';
-import { functionTodoUpdate } from '../../lambda/todos/functionTodoUpdate';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { IamRoles } from '../../iamRole';
 
 export const resourceNameTodo = 'todos'
 
-export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): void => {
+export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamRoles: IamRoles): void => {
   //リソースにGETメソッド、Lambda統合プロキシを指定
   route.apiTodos.addMethod(
     'GET',
-    new LambdaIntegration(functionTodoIndex(scope))
+    new LambdaIntegration(functionTodoIndex(scope, iamRoles.lambdaBasicRole))
   );
 
   route.apiTodo.addMethod(
     'GET',
-    new LambdaIntegration(functionTodoDetail(scope)),
+    new LambdaIntegration(functionTodoDetail(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
         'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
@@ -31,7 +28,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
 
   route.apiTodo.addMethod(
     'POST',
-    new LambdaIntegration(functionTodoCreate(scope)),
+    new LambdaIntegration(functionTodoCreate(scope, iamRoles.lambdaBasicRole)),
     {
       requestValidatorOptions: {
         validateRequestParameters: true,
@@ -41,7 +38,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
 
   route.apiTodo.addMethod(
     'PATCH',
-    new LambdaIntegration(functionTodoUpdate(scope)),
+    new LambdaIntegration(functionTodoUpdate(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
         'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
@@ -54,7 +51,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping): voi
 
   route.apiTodo.addMethod(
     'DELETE',
-    new LambdaIntegration(functionTodoDelete(scope)),
+    new LambdaIntegration(functionTodoDelete(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
         'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk

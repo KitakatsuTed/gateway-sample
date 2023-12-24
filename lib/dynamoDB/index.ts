@@ -1,6 +1,4 @@
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
-import * as cdk from 'aws-cdk-lib';
 import { buildTodosTable } from './todosTable';
 import { buildSequenceTable } from './sequenceTable';
 

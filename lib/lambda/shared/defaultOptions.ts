@@ -1,7 +1,6 @@
 import { Runtime } from "aws-cdk-lib/aws-lambda"
 import * as cdk from 'aws-cdk-lib';
 import path from "path";
-import { iamRoles } from "../../iamRole";
 import { NodejsFunctionProps } from "aws-cdk-lib/aws-lambda-nodejs";
 
 export const defaultOptions: Partial<NodejsFunctionProps> = {
@@ -9,6 +8,7 @@ export const defaultOptions: Partial<NodejsFunctionProps> = {
   runtime: Runtime.NODEJS_20_X,
   memorySize: 512,
   timeout: cdk.Duration.seconds(10),
+  //https://qiita.com/takmot/items/0fa7f589d318b8e5ea16
   bundling: {
     minify: true,
     sourceMap: true,

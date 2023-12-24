@@ -22,11 +22,11 @@
     "typescript": "~5.2.2"
   },
   "dependencies": {
-    "@aws-cdk/aws-events": "^1.204.0",
-    "@aws-cdk/aws-events-targets": "^1.204.0",
-    "@aws-cdk/aws-iam": "^1.204.0",
-    "@aws-cdk/aws-lambda": "^1.204.0",
-    "@aws-cdk/aws-ssm": "^1.204.0",
+    "@aws-cdk/aws-events": "^1.149.0",
+    "@aws-cdk/aws-events-targets": "^1.100.0",
+    "@aws-cdk/aws-iam": "^1.149.0",
+    "@aws-cdk/aws-lambda": "^1.19.0",
+    "@aws-cdk/aws-ssm": "^1.37.0",
     "@aws-sdk/client-dynamodb": "^3.465.0",
     "@aws-sdk/types": "^3.468.0",
     "@aws-sdk/util-dynamodb": "^3.474.0",
