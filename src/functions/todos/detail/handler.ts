@@ -2,8 +2,9 @@ import { FromSchema } from "json-schema-to-ts";
 import { middyfy } from "../../../lib/middleware/middy/middify";
 import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
 import { STATUS_CODE } from "../../../lib/exceptions/http/statusCode";
-import TodoService from "../../../lib/dynamodb/services/TodoService";
+import { TodoService } from "../../../lib/dynamodb/services/todoService";
 import { NotFoundException } from "../../../lib/exceptions/http/NotFoundException";
+import { Todo } from "../../../lib/entities/todo";
 
 export const eventSchema = {
   type: "object",
@@ -17,7 +18,6 @@ export const eventSchema = {
       },
       required: ["id"]
     },
-    body: {}
   },
   required: ['pathParameters']
 } as const;
@@ -26,6 +26,7 @@ export const eventSchema = {
 async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseModel> {
   const todoService = new TodoService()
 
+  // 自前で実装したい人はgetAsyncを直接使えば良い
   const todo = await todoService.findBy(
     { id: request.pathParameters.id }
   )
@@ -34,11 +35,11 @@ async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseMo
     throw new NotFoundException(`Couldn't find Todo with ${request.pathParameters.id}`)
   }
 
-  await todoService.delete(todo);
-
   return {
-    statusCode: STATUS_CODE.NO_CONTENT,
-    body: {},
+    statusCode: STATUS_CODE.OK,
+    body: {
+      data: todo
+    },
   }
 }
 

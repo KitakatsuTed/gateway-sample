@@ -1,4 +1,4 @@
-import { InvalidAttributeException } from '../dynamodb/exceptions/InvalidAttributeException';
+import { InvalidAttributeException } from '../exceptions/InvalidAttributeException';
 import { getClassProperties } from '../utility/getClassProperties';
 // https://blog.serverworks.co.jp/dynamodb-cheatsheet
 export interface IEntityBase {
@@ -14,7 +14,7 @@ const UNMUTABLE_ATTRS = ["id", "createdAt", "updatedAt"]
 // keyはジェネリクスのkeyに依存させたかった
 type Error = Record<string, string>
 
-export abstract class EntityBase {
+export abstract class EntityBase implements IEntityBase {
   public errors: Error[]
 
   constructor(

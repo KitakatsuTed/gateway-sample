@@ -14,8 +14,8 @@ export const buildTodosTable = (scope: Construct) => {
       type: dynamodb.AttributeType.STRING,
     },
     sortKey: { // ソートキーの定義
-      name: 'name',
-      type: dynamodb.AttributeType.STRING,
+      name: 'createdAt',
+      type: dynamodb.AttributeType.NUMBER,
     },
   });
 } 

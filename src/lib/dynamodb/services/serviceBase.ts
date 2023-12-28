@@ -1,4 +1,4 @@
-import { EntityBase } from '../../entities/entityBase';
+import { EntityBase } from '../entities/entityBase';
 import { CollectionBase } from '../collections/collectionBase';
 import { RepositoryBase } from '../repositories/repositoryBase';
 import { ConditionBase } from '../conditions/conditionBase';

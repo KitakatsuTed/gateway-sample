@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { EntityBase } from '../../entities/entityBase';
+import { EntityBase } from '../entities/entityBase';
 
 export abstract class CollectionBase<TEntity extends EntityBase> extends Set<TEntity> {
   Count?: AWS.DynamoDB.Integer;

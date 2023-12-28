@@ -1,15 +1,10 @@
-import { IEntityBase, EntityBase } from "./entityBase";
+import { EntityBase } from "../dynamodb/entities/entityBase";
 
 export type Status = 'incomplete' | 'done'
 
-export interface ITodo extends IEntityBase {
-  title?: string;
-  describe?: string;
-  status: Status;
-  doneAt?: number;
-}
-
-export class Todo extends EntityBase implements ITodo {
+// このディレクトリにはdynamo依存しないクラスも存在させることを許す
+// dynamo依存させるときはEntityBaseを継承すれば良い
+export class Todo extends EntityBase {
   constructor(
     public id: string | undefined,
     public status: Status,

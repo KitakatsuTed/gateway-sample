@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { EntityBase } from '../../entities/entityBase';
+import { EntityBase } from '../entities/entityBase';
 import { CollectionBase } from '../collections/collectionBase';
 import { ConditionBase } from '../conditions/conditionBase';
 import { DateTime } from 'luxon';
@@ -132,7 +132,6 @@ export abstract class RepositoryBase<
     const doQuery = async (
       parameters: AWS.DynamoDB.DocumentClient.QueryInput
     ) => {
-
       // データ取得
       const output: AWS.DynamoDB.DocumentClient.QueryOutput = await this.dbContext.query(parameters).promise();
 

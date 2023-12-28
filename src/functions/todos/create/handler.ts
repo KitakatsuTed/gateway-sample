@@ -2,7 +2,7 @@ import { FromSchema } from "json-schema-to-ts";
 import { middyfy } from "../../../lib/middleware/middy/middify";
 import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
 import { STATUS_CODE } from "../../../lib/exceptions/http/statusCode";
-import TodoService from "../../../lib/dynamodb/services/TodoService";
+import { TodoService } from "../../../lib/dynamodb/services/todoService";
 import { Todo } from "../../../lib/entities/todo";
 import { UnprocessableEntityException } from "../../../lib/exceptions/http/UnprocessableEntityException";
 
@@ -45,9 +45,6 @@ async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseMo
   if (!res) {
     throw new UnprocessableEntityException(undefined, todo.errors)
   }
-
-  // 自前で実装したい人はgetAsyncを直接使えば良い
-  // const todo = await todoService.create()
 
   return {
     statusCode: STATUS_CODE.OK,

@@ -5,6 +5,7 @@ import validator from "@middy/validator";
 import middy from "@middy/core";
 import { Handler } from "aws-lambda";
 import responseSchema from "../../../lib/middleware/middy/responseSchema";
+import { transpileSchema } from '@middy/validator/transpile'
 import { ResponseModel } from './ResponseModel';
 import { responseModelConverter } from "./responseModelConverter";
 
@@ -20,11 +21,11 @@ export function middyfy<S extends JSONSchema, H extends ValidatedRequestEventHan
   const m = middy()
     .use(httpErrorHandler({ fallbackMessage: unhandledErrorMessage }))
     .use(inputOutputLogger())
-    .use(responseModelConverter())
-    .use(validator({ responseSchema }));
-  if (eventSchema !== undefined) {
-    m.use(validator({ eventSchema }));
-  }
-  m.handler(handler);
+    .use(validator({ responseSchema: transpileSchema(responseSchema) }))
+    if (typeof eventSchema === 'object') {
+      m.use(validator({ eventSchema: transpileSchema(eventSchema) }));
+    }
+    m.use(responseModelConverter())
+    m.handler(handler);
   return m;
 }
