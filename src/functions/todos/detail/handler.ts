@@ -4,7 +4,6 @@ import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
 import { STATUS_CODE } from "../../../lib/http/statusCode";
 import { TodoService } from "../../../lib/services/todoService";
 import { NotFoundException } from "../../../lib/exceptions/http/NotFoundException";
-import { Todo } from "../../../lib/entities/todo";
 
 export const eventSchema = {
   type: "object",

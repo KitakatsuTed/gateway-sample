@@ -6,8 +6,8 @@ import { getClassProperties } from "./getClassProperties";
 
 export const getAttributes = <T extends object>(
   entity: T,
-): { [k: string]: any } => {
-  let attrs: [keyof T, any][] = [];
+): { [k: string]: any } => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const attrs: [keyof T, any][] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
   const propertyKeys = getClassProperties(entity);
 
   propertyKeys.forEach((key) => {

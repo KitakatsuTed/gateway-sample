@@ -53,7 +53,7 @@ export abstract class RepositoryBase<
   /**
    * 選択 get
    * @param condition パラメータ
-   * @returns TEntity　もしくは undefined
+   * @returns TEntity もしくは undefined
    */
   public async getAsync(condition: TCondition): Promise<TEntity | undefined> {
     if (condition.getItemInput === undefined) {
