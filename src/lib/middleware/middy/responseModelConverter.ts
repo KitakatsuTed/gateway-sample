@@ -7,7 +7,7 @@ export function responseModelConverter(): middy.MiddlewareObj {
       const response = request.response;
       
       request.response = {
-        statusCode: response.code,
+        statusCode: response.statusCode,
         body: JSON.stringify(response.body),
       };
     }

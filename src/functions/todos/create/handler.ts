@@ -1,8 +1,8 @@
 import { FromSchema } from "json-schema-to-ts";
 import { middyfy } from "../../../lib/middleware/middy/middify";
 import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
-import { STATUS_CODE } from "../../../lib/exceptions/http/statusCode";
-import { TodoService } from "../../../lib/dynamodb/services/todoService";
+import { STATUS_CODE } from "../../../lib/http/statusCode";
+import { TodoService } from "../../../lib/services/todoService";
 import { Todo } from "../../../lib/entities/todo";
 import { UnprocessableEntityException } from "../../../lib/exceptions/http/UnprocessableEntityException";
 

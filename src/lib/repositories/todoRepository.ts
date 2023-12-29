@@ -1,9 +1,9 @@
 import * as AWS from 'aws-sdk';
-import { RepositoryBase } from './repositoryBase';
-import { TodoCondition as Condition } from '../conditions/todoCondition';
-import { Todo as Entity } from '../../entities/todo';
+import { RepositoryBase } from '../dynamodb/repositories/repositoryBase';
+import { TodoCondition as Condition } from '../collections/conditions/todoCondition';
+import { Todo as Entity } from '../entities/todo';
 import { TodoCollection as Collection } from '../collections/todoCollection';
-import { TODOS_TABLE_NAME } from '../../../../lib/dynamoDB/todosTable';
+import { TODOS_TABLE_NAME } from '../../../lib/dynamoDB/todosTable';
 
 export class TodoRepository extends RepositoryBase<Condition, Entity, Collection> {
   protected tableName: string = TODOS_TABLE_NAME;

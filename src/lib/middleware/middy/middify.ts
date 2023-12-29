@@ -7,7 +7,6 @@ import { Handler } from "aws-lambda";
 import responseSchema from "../../../lib/middleware/middy/responseSchema";
 import { transpileSchema } from '@middy/validator/transpile'
 import { ResponseModel } from './ResponseModel';
-import { responseModelConverter } from "./responseModelConverter";
 
 export type ValidatedRequestEventHandler<S extends JSONSchema> = Handler<FromSchema<S>, ResponseModel>;
 
@@ -25,7 +24,6 @@ export function middyfy<S extends JSONSchema, H extends ValidatedRequestEventHan
     if (typeof eventSchema === 'object') {
       m.use(validator({ eventSchema: transpileSchema(eventSchema) }));
     }
-    m.use(responseModelConverter())
     m.handler(handler);
   return m;
 }
