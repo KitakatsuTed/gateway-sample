@@ -1,8 +1,8 @@
-import { HttpBaseException } from './HttpBaseException';
+import { HttpBaseException } from "./HttpBaseException";
 export class UnprocessableEntityException extends HttpBaseException {
   /**
    * コンストラクタ
    * @param message メッセージ
    */
-  statusCode = 422
+  statusCode = 422;
 }

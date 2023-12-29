@@ -1,4 +1,3 @@
-import { ConditionBase } from '../../dynamodb/conditions/conditionBase';
+import { ConditionBase } from "../../dynamodb/conditions/conditionBase";
 
-export class TodoCondition extends ConditionBase {
-}
+export class TodoCondition extends ConditionBase {}

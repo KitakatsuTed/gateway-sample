@@ -14,62 +14,68 @@ export const eventSchema = {
       type: "object",
       properties: {
         id: {
-          type: "string"
-        }
+          type: "string",
+        },
       },
-      required: ["id"]
+      required: ["id"],
     },
     body: {
       type: "object",
       properties: {
         title: {
-          type: "string"
+          type: "string",
         },
         describe: {
-          type: "string"
+          type: "string",
         },
         status: {
-          enum: ["incomplete", "done"]
+          enum: ["incomplete", "done"],
         },
         doneAt: {
-          type: "string"
-        }
+          type: "string",
+        },
       },
-      required: ['status']
+      required: ["status"],
     },
   },
-  required: ['pathParameters', 'body']
+  required: ["pathParameters", "body"],
 } as const;
 
 // request: eventSchema.property で型付けされている。
-async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseModel> {
-  const todoService = new TodoService()
-  const todo = await todoService.findBy({ id: request.pathParameters.id })
+async function main(
+  request: FromSchema<typeof eventSchema>,
+): Promise<ResponseModel> {
+  const todoService = new TodoService();
+  const todo = await todoService.findBy({ id: request.pathParameters.id });
 
   if (todo === undefined) {
-    throw new NotFoundException(`Couldn't find Todo with ${request.pathParameters.id}`)
+    throw new NotFoundException(
+      `Couldn't find Todo with ${request.pathParameters.id}`,
+    );
   }
 
   todo.assignAttribute({
     title: request.body.title,
     describe: request.body.describe,
     status: request.body.status,
-    doneAt: request.body.doneAt ? DateTime.fromISO(request.body.doneAt).toMillis() : undefined,
-  })
+    doneAt: request.body.doneAt
+      ? DateTime.fromISO(request.body.doneAt).toMillis()
+      : undefined,
+  });
 
   const res = todoService.update(todo);
 
   if (!res) {
-    throw new UnprocessableEntityException(undefined, todo.errors)
+    throw new UnprocessableEntityException(undefined, todo.errors);
   }
 
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todo
+      data: todo,
     },
-  }
+  };
 }
 
 // これがexportされるhandler
-export const handler = middyfy({ eventSchema: eventSchema, handler: main })
+export const handler = middyfy({ eventSchema: eventSchema, handler: main });

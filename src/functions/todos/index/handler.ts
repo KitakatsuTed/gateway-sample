@@ -6,22 +6,25 @@ import { STATUS_CODE } from "../../../lib/http/statusCode";
 import { TodoService } from "../../../lib/services/todoService";
 
 // request: eventSchema.property で型付けされている。
-async function main(_request: FromSchema<typeof eventDefaultSchema>): Promise<ResponseModel> {
-  const todoService = new TodoService()
+async function main(
+  _request: FromSchema<typeof eventDefaultSchema>,
+): Promise<ResponseModel> {
+  const todoService = new TodoService();
 
-  const todos = await todoService.queryAllAsync(
-    {
-      queryInput: todoService.buildQueryInput({ id: '1' })
-    }
-  )
+  const todos = await todoService.queryAllAsync({
+    queryInput: todoService.buildQueryInput({ id: "1" }),
+  });
 
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todos
+      data: todos,
     },
-  }
+  };
 }
 
 // これがexportされるhandler
-export const handler = middyfy({ eventSchema: eventDefaultSchema, handler: main })
+export const handler = middyfy({
+  eventSchema: eventDefaultSchema,
+  handler: main,
+});

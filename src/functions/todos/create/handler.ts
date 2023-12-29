@@ -14,23 +14,25 @@ export const eventSchema = {
       type: "object",
       properties: {
         title: {
-          type: "string"
+          type: "string",
         },
         describe: {
-          type: "string"
+          type: "string",
         },
         status: {
-          enum: ["incomplete", "done"]
+          enum: ["incomplete", "done"],
         },
       },
-      required: ['status']
+      required: ["status"],
     },
   },
-  required: ['body']
+  required: ["body"],
 } as const;
 
 // request: eventSchema.property で型付けされている。
-async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseModel> {
+async function main(
+  request: FromSchema<typeof eventSchema>,
+): Promise<ResponseModel> {
   // idに当たる引数をundefinedにするのはちょっと気持ち悪いけど、idは第一引数にいて欲しいので我慢する
   const todo = new Todo(
     undefined,
@@ -38,21 +40,21 @@ async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseMo
     request.body.title,
     request.body.describe,
     undefined,
-  )
-  const todoService = new TodoService()
+  );
+  const todoService = new TodoService();
   const res = await todoService.create(todo);
 
   if (!res) {
-    throw new UnprocessableEntityException(undefined, todo.errors)
+    throw new UnprocessableEntityException(undefined, todo.errors);
   }
 
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todo
+      data: todo,
     },
-  }
+  };
 }
 
 // これがexportされるhandler
-export const handler = middyfy({ eventSchema: eventSchema, handler: main })
+export const handler = middyfy({ eventSchema: eventSchema, handler: main });

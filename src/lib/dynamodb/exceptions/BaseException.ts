@@ -9,24 +9,27 @@ export abstract class BaseException extends Error {
   statusCode: 500;
 
   // 一部middy@http-error-handlerのプロパティに合わせている
-  constructor(message?: string, public details?: Record<string, string>[]) {
+  constructor(
+    message?: string,
+    public details?: Record<string, string>[],
+  ) {
     super(message);
 
     this.name = this.constructor.name;
     this.describeMessage();
   }
 
-  private describeMessage(){
+  private describeMessage() {
     const statusCode = this.statusCode;
     const errorType = this.constructor.name;
-    const errorMessage =  `${this.getMessageByError()}: ${this.message}`;
-    const details =  this.details;
+    const errorMessage = `${this.getMessageByError()}: ${this.message}`;
+    const details = this.details;
 
-    console.error('StatusCode: ' + statusCode);
-    console.error('ErrorType: ' + errorType);
-    console.error('ErrorMessage: ' + errorMessage);
-    console.error('Details: ' + details);
+    console.error("StatusCode: " + statusCode);
+    console.error("ErrorType: " + errorType);
+    console.error("ErrorMessage: " + errorMessage);
+    console.error("Details: " + details);
   }
 
-  abstract getMessageByError(): string
+  abstract getMessageByError(): string;
 }

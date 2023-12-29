@@ -12,25 +12,27 @@ export const eventSchema = {
       type: "object",
       properties: {
         id: {
-          type: "string"
-        }
+          type: "string",
+        },
       },
-      required: ["id"]
+      required: ["id"],
     },
   },
-  required: ['pathParameters']
+  required: ["pathParameters"],
 } as const;
 
 // request: eventSchema.property で型付けされている。
-async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseModel> {
-  const todoService = new TodoService()
+async function main(
+  request: FromSchema<typeof eventSchema>,
+): Promise<ResponseModel> {
+  const todoService = new TodoService();
 
-  const todo = await todoService.findBy(
-    { id: request.pathParameters.id }
-  )
+  const todo = await todoService.findBy({ id: request.pathParameters.id });
 
   if (todo === undefined) {
-    throw new NotFoundException(`Couldn't find Todo with ${request.pathParameters.id}`)
+    throw new NotFoundException(
+      `Couldn't find Todo with ${request.pathParameters.id}`,
+    );
   }
 
   await todoService.delete(todo);
@@ -38,8 +40,8 @@ async function main(request: FromSchema<typeof eventSchema>): Promise<ResponseMo
   return {
     statusCode: STATUS_CODE.NO_CONTENT,
     body: {},
-  }
+  };
 }
 
 // これがexportされるhandler
-export const handler = middyfy({ eventSchema: eventSchema, handler: main })
+export const handler = middyfy({ eventSchema: eventSchema, handler: main });

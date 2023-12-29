@@ -1,6 +1,5 @@
-import * as AWS from 'aws-sdk';
+import * as AWS from "aws-sdk";
 export abstract class ConditionBase {
-
   getItemInput?: {
     Key: AWS.DynamoDB.DocumentClient.Key;
     AttributesToGet?: AWS.DynamoDB.DocumentClient.AttributeNameList;
@@ -66,5 +65,5 @@ export abstract class ConditionBase {
     ExpressionAttributeNames?: AWS.DynamoDB.DocumentClient.ExpressionAttributeNameMap;
     ExpressionAttributeValues?: AWS.DynamoDB.DocumentClient.ExpressionAttributeValueMap;
     ReturnValuesOnConditionCheckFailure?: AWS.DynamoDB.DocumentClient.ReturnValuesOnConditionCheckFailure;
-  }
+  };
 }

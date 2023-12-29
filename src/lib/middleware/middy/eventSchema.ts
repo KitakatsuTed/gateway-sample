@@ -3,5 +3,5 @@ export const eventDefaultSchema = {
   properties: {
     pathParameters: {},
   },
-  required: []
+  required: [],
 } as const;

@@ -5,6 +5,6 @@ export class KeyNullException extends BaseException {
   }
 
   getMessageByError(): string {
-    return 'Id is undefined.'
+    return "Id is undefined.";
   }
 }

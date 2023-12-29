@@ -1,15 +1,14 @@
-import { EntityBase } from '../entities/entityBase';
-import { CollectionBase } from '../collections/collectionBase';
-import { RepositoryBase } from '../repositories/repositoryBase';
-import { ConditionBase } from '../conditions/conditionBase';
+import { EntityBase } from "../entities/entityBase";
+import { CollectionBase } from "../collections/collectionBase";
+import { RepositoryBase } from "../repositories/repositoryBase";
+import { ConditionBase } from "../conditions/conditionBase";
 
 export abstract class ServiceBase<
   TCondition extends ConditionBase,
   TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>,
-  TRepository extends RepositoryBase<TCondition, TEntity, TCollection>
+  TRepository extends RepositoryBase<TCondition, TEntity, TCollection>,
 > {
-
   public repository: TRepository;
 
   constructor(repository: TRepository) {
@@ -28,15 +27,21 @@ export abstract class ServiceBase<
     return this.repository.queryAllAsync(condition);
   }
 
-  public async putAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
+  public async putAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
     return this.repository.putAsync(condition);
   }
 
-  public async updateAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput> {
+  public async updateAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput> {
     return this.repository.updateAsync(condition);
   }
 
-  public async deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
+  public async deleteAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
     return this.repository.deleteAsync(condition);
   }
 }

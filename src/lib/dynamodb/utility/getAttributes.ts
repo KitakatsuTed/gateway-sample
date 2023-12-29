@@ -2,15 +2,17 @@
 // utilityに置くと、あちこちで自由に使われるので本当はEntityBaseなどの基底クラスにおきたかったがthis[x]の
 // コンパイルエラーが解消できなそうなので一旦utilityにおく
 
-import { getClassProperties } from "./getClassProperties"
+import { getClassProperties } from "./getClassProperties";
 
-export const getAttributes = <T extends object>(entity: T): { [k: string]: any; } => {
-  let attrs: [keyof T, any][] = []
-  const propertyKeys = getClassProperties(entity)
+export const getAttributes = <T extends object>(
+  entity: T,
+): { [k: string]: any } => {
+  let attrs: [keyof T, any][] = [];
+  const propertyKeys = getClassProperties(entity);
 
   propertyKeys.forEach((key) => {
-    attrs.push([key as keyof T, entity[key as keyof T]])
-  })
+    attrs.push([key as keyof T, entity[key as keyof T]]);
+  });
 
-  return Object.fromEntries(attrs)
-}
+  return Object.fromEntries(attrs);
+};

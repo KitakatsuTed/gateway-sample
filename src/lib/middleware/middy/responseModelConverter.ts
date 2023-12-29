@@ -5,11 +5,11 @@ export function responseModelConverter(): middy.MiddlewareObj {
     // handlerがreturnした後に適用される処理
     after: (request) => {
       const response = request.response;
-      
+
       request.response = {
         statusCode: response.statusCode,
         body: JSON.stringify(response.body),
       };
-    }
-  }
+    },
+  };
 }

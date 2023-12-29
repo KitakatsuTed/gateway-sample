@@ -3,10 +3,15 @@
 
 export const getClassProperties = (obj: object): string[] => {
   const getOwnProperties = (obj: object) =>
-      Object.entries(Object.getOwnPropertyDescriptors(obj))
-          .filter(([_name, {value}]) => typeof value !== 'function')
-          .map(([name]) => name)
+    Object.entries(Object.getOwnPropertyDescriptors(obj))
+      .filter(([_name, { value }]) => typeof value !== "function")
+      .map(([name]) => name);
   const _getProperties = (o: object, properties: string[]): string[] =>
-      o === Object.prototype ? properties : _getProperties(Object.getPrototypeOf(o), properties.concat(getOwnProperties(o)))
-  return _getProperties(obj, [])
-} 
+    o === Object.prototype
+      ? properties
+      : _getProperties(
+          Object.getPrototypeOf(o),
+          properties.concat(getOwnProperties(o)),
+        );
+  return _getProperties(obj, []);
+};

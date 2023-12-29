@@ -6,6 +6,6 @@ export class InvalidAttributeException extends BaseException {
   }
 
   getMessageByError(): string {
-    return 'Assign attribute is invalid'
+    return "Assign attribute is invalid";
   }
 }

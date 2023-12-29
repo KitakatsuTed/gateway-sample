@@ -6,6 +6,6 @@ export class ArgumentNullException extends BaseException {
   }
 
   getMessageByError(): string {
-    return 'Condition is must be needed.'
+    return "Condition is must be needed.";
   }
 }

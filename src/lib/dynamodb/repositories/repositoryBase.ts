@@ -1,30 +1,37 @@
-import * as AWS from 'aws-sdk';
-import { EntityBase } from '../entities/entityBase';
-import { CollectionBase } from '../collections/collectionBase';
-import { ConditionBase } from '../conditions/conditionBase';
-import { DateTime } from 'luxon';
-import { ArgumentNullException } from '../exceptions/ArgumentNullExceptions';
+import * as AWS from "aws-sdk";
+import { EntityBase } from "../entities/entityBase";
+import { CollectionBase } from "../collections/collectionBase";
+import { ConditionBase } from "../conditions/conditionBase";
+import { DateTime } from "luxon";
+import { ArgumentNullException } from "../exceptions/ArgumentNullExceptions";
 
 export interface IRepositoryBase<
   TCondition extends ConditionBase,
   TEntity extends EntityBase,
-  TCollection extends CollectionBase<TEntity>
+  TCollection extends CollectionBase<TEntity>,
 > {
   getAsync(condition: TCondition): Promise<TEntity | undefined>;
   queryAsync(condition: TCondition): Promise<TCollection>;
   queryAllAsync(condition: TCondition): Promise<TCollection>;
-  putAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput>;
-  updateAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput>;
-  deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>
+  putAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput>;
+  updateAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput>;
+  deleteAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>;
 }
 
-const SEQUENCE_TABLE_NAME = 'sequence' as const
+const SEQUENCE_TABLE_NAME = "sequence" as const;
 
 export abstract class RepositoryBase<
   TCondition extends ConditionBase,
   TEntity extends EntityBase,
-  TCollection extends CollectionBase<TEntity>
-> implements IRepositoryBase<ConditionBase, TEntity, TCollection> {
+  TCollection extends CollectionBase<TEntity>,
+> implements IRepositoryBase<ConditionBase, TEntity, TCollection>
+{
   /**
    * テーブル名
    */
@@ -56,9 +63,8 @@ export abstract class RepositoryBase<
     // パラメータ設定
     const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
       TableName: this.tableName,
-      Key: condition.getItemInput.Key
+      Key: condition.getItemInput.Key,
     };
-
 
     // コピー
     Object.assign(params, condition.getItemInput);
@@ -74,13 +80,14 @@ export abstract class RepositoryBase<
   }
 
   /**
-     * query
-     * @param condition パラメータ
-     * @returns コレクション
-     */
+   * query
+   * @param condition パラメータ
+   * @returns コレクション
+   */
   public async queryAsync(condition: TCondition): Promise<TCollection> {
     // DynamoDB queryパラメータ設定
-    const params: AWS.DynamoDB.DocumentClient.QueryInput = this.createQueryParameters(condition);
+    const params: AWS.DynamoDB.DocumentClient.QueryInput =
+      this.createQueryParameters(condition);
 
     // 発行するクエリをログに出す
     console.log(params);
@@ -98,7 +105,6 @@ export abstract class RepositoryBase<
 
     // 結果がある場合、コレクションに詰める
     if (output.Items !== undefined) {
-
       for (const item of output.Items) {
         // エンティティ取得
         const entity = this.getEntity(item);
@@ -120,7 +126,8 @@ export abstract class RepositoryBase<
    */
   public async queryAllAsync(condition: TCondition): Promise<TCollection> {
     // DynamoDB getItemパラメータ設定
-    const params: AWS.DynamoDB.DocumentClient.QueryInput = this.createQueryParameters(condition);
+    const params: AWS.DynamoDB.DocumentClient.QueryInput =
+      this.createQueryParameters(condition);
 
     // 発行するクエリをログに出す
     console.log(params);
@@ -130,14 +137,14 @@ export abstract class RepositoryBase<
 
     // query
     const doQuery = async (
-      parameters: AWS.DynamoDB.DocumentClient.QueryInput
+      parameters: AWS.DynamoDB.DocumentClient.QueryInput,
     ) => {
       // データ取得
-      const output: AWS.DynamoDB.DocumentClient.QueryOutput = await this.dbContext.query(parameters).promise();
+      const output: AWS.DynamoDB.DocumentClient.QueryOutput =
+        await this.dbContext.query(parameters).promise();
 
       // 結果がある場合、コレクションに詰める
       if (output.Items !== undefined) {
-
         for (const item of output.Items) {
           // エンティティ取得
           const entity = this.getEntity(item);
@@ -170,7 +177,9 @@ export abstract class RepositoryBase<
    * @param condition パラメータ
    * @returns 実行結果
    */
-  public async putAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
+  public async putAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
     if (condition.putItemInput === undefined) {
       throw new ArgumentNullException();
     }
@@ -178,7 +187,7 @@ export abstract class RepositoryBase<
     // DynamoDB putItemパラメータ設定
     const params: AWS.DynamoDB.DocumentClient.PutItemInput = {
       TableName: this.tableName,
-      Item: condition.putItemInput.Item
+      Item: condition.putItemInput.Item,
     };
 
     const newId = await this.getNewSequence();
@@ -188,7 +197,7 @@ export abstract class RepositoryBase<
       id: newId,
       createdAt: DateTime.now().toMillis(),
       updatedAt: DateTime.now().toMillis(),
-    }
+    };
 
     // パラメータコピー
     Object.assign(params, condition.putItemInput);
@@ -204,7 +213,9 @@ export abstract class RepositoryBase<
    * @param condition パラメータ
    * @returns 実行結果
    */
-  public async updateAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput> {
+  public async updateAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput> {
     if (condition.updateItemInput === undefined) {
       throw new ArgumentNullException();
     }
@@ -212,7 +223,7 @@ export abstract class RepositoryBase<
     // DynamoDB putItemパラメータ設定
     const params: AWS.DynamoDB.DocumentClient.UpdateItemInput = {
       TableName: this.tableName,
-      Key: condition.updateItemInput.Key
+      Key: condition.updateItemInput.Key,
     };
 
     // パラメータコピー
@@ -230,7 +241,9 @@ export abstract class RepositoryBase<
    * @param condition パラメータ
    * @returns 実行結果
    */
-  public async deleteAsync(condition: TCondition): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
+  public async deleteAsync(
+    condition: TCondition,
+  ): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
     if (condition.deleteItemInput === undefined) {
       throw new ArgumentNullException();
     }
@@ -238,7 +251,7 @@ export abstract class RepositoryBase<
     // DynamoDB deleteItemパラメータ設定
     const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
       TableName: this.tableName,
-      Key: condition.deleteItemInput.Key
+      Key: condition.deleteItemInput.Key,
     };
 
     // パラメータコピー
@@ -256,7 +269,9 @@ export abstract class RepositoryBase<
    * @param item エンティティ
    * @returns エンティティ | undefined
    */
-  protected abstract getEntity(item?: AWS.DynamoDB.DocumentClient.AttributeMap): TEntity | undefined;
+  protected abstract getEntity(
+    item?: AWS.DynamoDB.DocumentClient.AttributeMap,
+  ): TEntity | undefined;
 
   /**
    * コレクション作成（インスタンス生成のみ）
@@ -269,7 +284,7 @@ export abstract class RepositoryBase<
    * @returns queryパラメータ
    */
   private createQueryParameters(
-    condition: TCondition
+    condition: TCondition,
   ): AWS.DynamoDB.DocumentClient.QueryInput {
     if (condition.queryInput === undefined) {
       throw new ArgumentNullException();
@@ -277,7 +292,7 @@ export abstract class RepositoryBase<
 
     // DynamoDB queryパラメータ設定
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
-      TableName: this.tableName
+      TableName: this.tableName,
     };
 
     // パラメータコピー
@@ -296,14 +311,16 @@ export abstract class RepositoryBase<
       updateItemInput: {
         UpdateExpression: "set currentNumber = currentNumber + :val",
         ExpressionAttributeValues: {
-          ":val": 1
+          ":val": 1,
         },
-        ReturnValues: "UPDATED_NEW"
-      }
+        ReturnValues: "UPDATED_NEW",
+      },
     };
 
-    const id = await this.dbContext.update(params).promise()
-    if (id.Attributes?.currentNumber === undefined) { throw '最新のid取得に失敗しました。' }
+    const id = await this.dbContext.update(params).promise();
+    if (id.Attributes?.currentNumber === undefined) {
+      throw "最新のid取得に失敗しました。";
+    }
 
     return Number(id.Attributes?.currentNumber);
   }

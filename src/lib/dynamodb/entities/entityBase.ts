@@ -1,5 +1,5 @@
-import { InvalidAttributeException } from '../exceptions/InvalidAttributeException';
-import { getClassProperties } from '../utility/getClassProperties';
+import { InvalidAttributeException } from "../exceptions/InvalidAttributeException";
+import { getClassProperties } from "../utility/getClassProperties";
 // https://blog.serverworks.co.jp/dynamodb-cheatsheet
 export interface IEntityBase {
   readonly id: string | undefined;
@@ -9,45 +9,45 @@ export interface IEntityBase {
 
 // 本当はIEntityBaseから引いてきたかったが一旦これで
 // これらは自動生成する値の前提なので実装のロジックによって変わらないようにすること
-const UNMUTABLE_ATTRS = ["id", "createdAt", "updatedAt"]
+const UNMUTABLE_ATTRS = ["id", "createdAt", "updatedAt"];
 
 // keyはジェネリクスのkeyに依存させたかった
-type Error = Record<string, string>
+type Error = Record<string, string>;
 
 export abstract class EntityBase implements IEntityBase {
-  public errors: Error[]
+  public errors: Error[];
 
   constructor(
     public id: string | undefined,
     public createdAt?: number | undefined,
     public updatedAt?: number | undefined,
   ) {
-    this.errors = []
+    this.errors = [];
   }
 
   abstract validate(): boolean;
 
   idPersisted(): boolean {
-    return !!this.id
+    return !!this.id;
   }
 
   assignAttribute(attr: object): void {
-    const targetProperties = getClassProperties(this)
-    const attrKeys = Object.keys(attr)
+    const targetProperties = getClassProperties(this);
+    const attrKeys = Object.keys(attr);
 
     // 更新内容のプロパティが更新対象のオブジェクトのプロパティの一覧に含まれているかチェック
     // 16行目からasを利用するのでここでチェックをいれる
-    attrKeys.forEach(key => {
+    attrKeys.forEach((key) => {
       if (!targetProperties.includes(key) || []) {
-        throw new InvalidAttributeException(`attr: ${attr}`)
+        throw new InvalidAttributeException(`attr: ${attr}`);
       }
-    })
+    });
 
     // オブジェクトの値更新
-    attrKeys.forEach(key => {
+    attrKeys.forEach((key) => {
       if (!UNMUTABLE_ATTRS.includes(key)) {
-        this[key as keyof typeof this] = attr[key as keyof typeof attr]
+        this[key as keyof typeof this] = attr[key as keyof typeof attr];
       }
-    })
+    });
   }
 }
