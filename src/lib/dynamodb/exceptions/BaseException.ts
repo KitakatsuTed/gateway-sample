@@ -25,10 +25,10 @@ export abstract class BaseException extends Error {
     const errorMessage = `${this.getMessageByError()}: ${this.message}`;
     const details = this.details;
 
-    console.error("StatusCode: " + statusCode);
-    console.error("ErrorType: " + errorType);
-    console.error("ErrorMessage: " + errorMessage);
-    console.error("Details: " + details);
+    console.error('StatusCode: ' + statusCode);
+    console.error('ErrorType: ' + errorType);
+    console.error('ErrorMessage: ' + errorMessage);
+    console.error('Details: ' + details);
   }
 
   abstract getMessageByError(): string;

@@ -1,4 +1,4 @@
-import { ErrorMessageMapping } from "./ErrorMessageMapping";
+import { ErrorMessageMapping } from './ErrorMessageMapping';
 
 // https://go-to-k.hatenablog.com/entry/typescript-custom-error-class
 export abstract class HttpBaseException extends Error {
@@ -21,10 +21,10 @@ export abstract class HttpBaseException extends Error {
     const errorMessage = `${this.getMessageByErrorCode()}: ${this.message}`;
     const details = this.details;
 
-    console.error("StatusCode: " + statusCode);
-    console.error("ErrorType: " + errorType);
-    console.error("ErrorMessage: " + errorMessage);
-    console.error("Details: " + details);
+    console.error('StatusCode: ' + statusCode);
+    console.error('ErrorType: ' + errorType);
+    console.error('ErrorMessage: ' + errorMessage);
+    console.error('Details: ' + details);
   }
 
   private getMessageByErrorCode(): string {

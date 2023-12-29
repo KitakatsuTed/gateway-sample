@@ -1,12 +1,12 @@
-import { FromSchema, JSONSchema } from "json-schema-to-ts";
-import httpErrorHandler from "@middy/http-error-handler";
-import inputOutputLogger from "@middy/input-output-logger";
-import validator from "@middy/validator";
-import middy from "@middy/core";
-import { Handler } from "aws-lambda";
-import responseSchema from "../../../lib/middleware/middy/responseSchema";
-import { transpileSchema } from "@middy/validator/transpile";
-import { ResponseModel } from "./ResponseModel";
+import { FromSchema, JSONSchema } from 'json-schema-to-ts';
+import httpErrorHandler from '@middy/http-error-handler';
+import inputOutputLogger from '@middy/input-output-logger';
+import validator from '@middy/validator';
+import middy from '@middy/core';
+import { Handler } from 'aws-lambda';
+import responseSchema from '../../../lib/middleware/middy/responseSchema';
+import { transpileSchema } from '@middy/validator/transpile';
+import { ResponseModel } from './ResponseModel';
 
 export type ValidatedRequestEventHandler<S extends JSONSchema> = Handler<
   FromSchema<S>,
@@ -29,7 +29,7 @@ export function middyfy<
     .use(httpErrorHandler({ fallbackMessage: unhandledErrorMessage }))
     .use(inputOutputLogger())
     .use(validator({ responseSchema: transpileSchema(responseSchema) }));
-  if (typeof eventSchema === "object") {
+  if (typeof eventSchema === 'object') {
     m.use(validator({ eventSchema: transpileSchema(eventSchema) }));
   }
   m.handler(handler);

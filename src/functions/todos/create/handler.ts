@@ -1,32 +1,32 @@
-import { FromSchema } from "json-schema-to-ts";
-import { middyfy } from "../../../lib/middleware/middy/middify";
-import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
-import { STATUS_CODE } from "../../../lib/http/statusCode";
-import { TodoService } from "../../../lib/services/todoService";
-import { Todo } from "../../../lib/entities/todo";
-import { UnprocessableEntityException } from "../../../lib/exceptions/http/UnprocessableEntityException";
+import { FromSchema } from 'json-schema-to-ts';
+import { middyfy } from '../../../lib/middleware/middy/middify';
+import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
+import { STATUS_CODE } from '../../../lib/http/statusCode';
+import { TodoService } from '../../../lib/services/todoService';
+import { Todo } from '../../../lib/entities/todo';
+import { UnprocessableEntityException } from '../../../lib/exceptions/http/UnprocessableEntityException';
 
 export const eventSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     pathParameters: {},
     body: {
-      type: "object",
+      type: 'object',
       properties: {
         title: {
-          type: "string",
+          type: 'string',
         },
         describe: {
-          type: "string",
+          type: 'string',
         },
         status: {
-          enum: ["incomplete", "done"],
+          enum: ['incomplete', 'done'],
         },
       },
-      required: ["status"],
+      required: ['status'],
     },
   },
-  required: ["body"],
+  required: ['body'],
 } as const;
 
 // request: eventSchema.property で型付けされている。

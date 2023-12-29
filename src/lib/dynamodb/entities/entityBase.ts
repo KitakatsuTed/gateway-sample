@@ -1,5 +1,5 @@
-import { InvalidAttributeException } from "../exceptions/InvalidAttributeException";
-import { getClassProperties } from "../utility/getClassProperties";
+import { InvalidAttributeException } from '../exceptions/InvalidAttributeException';
+import { getClassProperties } from '../utility/getClassProperties';
 // https://blog.serverworks.co.jp/dynamodb-cheatsheet
 export interface IEntityBase {
   readonly id: string | undefined;
@@ -9,7 +9,7 @@ export interface IEntityBase {
 
 // 本当はIEntityBaseから引いてきたかったが一旦これで
 // これらは自動生成する値の前提なので実装のロジックによって変わらないようにすること
-const UNMUTABLE_ATTRS = ["id", "createdAt", "updatedAt"];
+const UNMUTABLE_ATTRS = ['id', 'createdAt', 'updatedAt'];
 
 // keyはジェネリクスのkeyに依存させたかった
 type Error = Record<string, string>;

@@ -1,24 +1,24 @@
-import { FromSchema } from "json-schema-to-ts";
-import { middyfy } from "../../../lib/middleware/middy/middify";
-import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
-import { STATUS_CODE } from "../../../lib/http/statusCode";
-import { TodoService } from "../../../lib/services/todoService";
-import { NotFoundException } from "../../../lib/exceptions/http/NotFoundException";
+import { FromSchema } from 'json-schema-to-ts';
+import { middyfy } from '../../../lib/middleware/middy/middify';
+import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
+import { STATUS_CODE } from '../../../lib/http/statusCode';
+import { TodoService } from '../../../lib/services/todoService';
+import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
 
 export const eventSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     pathParameters: {
-      type: "object",
+      type: 'object',
       properties: {
         id: {
-          type: "string",
+          type: 'string',
         },
       },
-      required: ["id"],
+      required: ['id'],
     },
   },
-  required: ["pathParameters"],
+  required: ['pathParameters'],
 } as const;
 
 // request: eventSchema.property で型付けされている。

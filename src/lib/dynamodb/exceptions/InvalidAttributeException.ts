@@ -1,4 +1,4 @@
-import { BaseException } from "./BaseException";
+import { BaseException } from './BaseException';
 
 export class InvalidAttributeException extends BaseException {
   constructor(message?: string) {
@@ -6,6 +6,6 @@ export class InvalidAttributeException extends BaseException {
   }
 
   getMessageByError(): string {
-    return "Assign attribute is invalid";
+    return 'Assign attribute is invalid';
   }
 }

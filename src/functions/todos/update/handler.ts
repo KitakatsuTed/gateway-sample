@@ -1,44 +1,44 @@
-import { FromSchema } from "json-schema-to-ts";
-import { middyfy } from "../../../lib/middleware/middy/middify";
-import { ResponseModel } from "../../../lib/middleware/middy/ResponseModel";
-import { STATUS_CODE } from "../../../lib/http/statusCode";
-import { TodoService } from "../../../lib/services/todoService";
-import { UnprocessableEntityException } from "../../../lib/exceptions/http/UnprocessableEntityException";
-import { DateTime } from "luxon";
-import { NotFoundException } from "../../../lib/exceptions/http/NotFoundException";
+import { FromSchema } from 'json-schema-to-ts';
+import { middyfy } from '../../../lib/middleware/middy/middify';
+import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
+import { STATUS_CODE } from '../../../lib/http/statusCode';
+import { TodoService } from '../../../lib/services/todoService';
+import { UnprocessableEntityException } from '../../../lib/exceptions/http/UnprocessableEntityException';
+import { DateTime } from 'luxon';
+import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
 
 export const eventSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     pathParameters: {
-      type: "object",
+      type: 'object',
       properties: {
         id: {
-          type: "string",
+          type: 'string',
         },
       },
-      required: ["id"],
+      required: ['id'],
     },
     body: {
-      type: "object",
+      type: 'object',
       properties: {
         title: {
-          type: "string",
+          type: 'string',
         },
         describe: {
-          type: "string",
+          type: 'string',
         },
         status: {
-          enum: ["incomplete", "done"],
+          enum: ['incomplete', 'done'],
         },
         doneAt: {
-          type: "string",
+          type: 'string',
         },
       },
-      required: ["status"],
+      required: ['status'],
     },
   },
-  required: ["pathParameters", "body"],
+  required: ['pathParameters', 'body'],
 } as const;
 
 // request: eventSchema.property で型付けされている。

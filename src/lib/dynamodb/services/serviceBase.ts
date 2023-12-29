@@ -1,13 +1,19 @@
-import { EntityBase } from "../entities/entityBase";
-import { CollectionBase } from "../collections/collectionBase";
-import { RepositoryBase } from "../repositories/repositoryBase";
-import { ConditionBase } from "../conditions/conditionBase";
+import { EntityBase } from '../entities/entityBase';
+import { CollectionBase } from '../collections/collectionBase';
+import { RepositoryBase } from '../repositories/repositoryBase';
+import {
+  DeleteItemInputBase,
+  GetItemInputBase,
+  PutItemInputBase,
+  QueryInputBase,
+  ScanInputBase,
+  UpdateItemInputBase,
+} from '../conditions';
 
 export abstract class ServiceBase<
-  TCondition extends ConditionBase,
   TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>,
-  TRepository extends RepositoryBase<TCondition, TEntity, TCollection>,
+  TRepository extends RepositoryBase<TEntity, TCollection>,
 > {
   public repository: TRepository;
 
@@ -15,32 +21,34 @@ export abstract class ServiceBase<
     this.repository = repository;
   }
 
-  public async getAsync(condition: TCondition): Promise<TEntity | undefined> {
+  public async getAsync(
+    condition: GetItemInputBase,
+  ): Promise<TEntity | undefined> {
     return this.repository.getAsync(condition);
   }
 
-  public async queryAsync(condition: TCondition): Promise<TCollection> {
+  public async queryAsync(condition: QueryInputBase): Promise<TCollection> {
     return this.repository.queryAsync(condition);
   }
 
-  public async queryAllAsync(condition: TCondition): Promise<TCollection> {
-    return this.repository.queryAllAsync(condition);
+  public async scanAllAsync(condition: ScanInputBase): Promise<TCollection> {
+    return this.repository.scanAllAsync(condition);
   }
 
   public async putAsync(
-    condition: TCondition,
+    condition: PutItemInputBase,
   ): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
     return this.repository.putAsync(condition);
   }
 
   public async updateAsync(
-    condition: TCondition,
+    condition: UpdateItemInputBase,
   ): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput> {
     return this.repository.updateAsync(condition);
   }
 
   public async deleteAsync(
-    condition: TCondition,
+    condition: DeleteItemInputBase,
   ): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput> {
     return this.repository.deleteAsync(condition);
   }

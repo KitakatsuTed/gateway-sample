@@ -1,13 +1,18 @@
-import { EntityBase } from "../entities/entityBase";
-import { ConditionBase } from "../conditions/conditionBase";
-import { CollectionBase } from "../collections/collectionBase";
-import { RepositoryBase } from "../repositories/repositoryBase";
-import { KeyNullException } from "../exceptions/keyNullException";
-import { AttributeValue } from "@aws-sdk/client-dynamodb";
-import { getAttributes } from "../utility/getAttributes";
-import { ServiceBase } from "../services/serviceBase";
-import { DateTime } from "luxon";
-import { Constructor } from "./Constructor";
+import { EntityBase } from '../entities/entityBase';
+import {
+  DeleteItemInputBase,
+  GetItemInputBase,
+  PutItemInputBase,
+  UpdateItemInputBase,
+} from '../conditions';
+import { CollectionBase } from '../collections/collectionBase';
+import { RepositoryBase } from '../repositories/repositoryBase';
+import { KeyNullException } from '../exceptions/keyNullException';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { getAttributes } from '../utility/getAttributes';
+import { ServiceBase } from '../services/serviceBase';
+import { DateTime } from 'luxon';
+import { Constructor } from './Constructor';
 
 type Item = {
   [key: string]: AttributeValue;
@@ -18,22 +23,17 @@ type Item = {
 // ジェネリクスの依存関係の都合でService層での実装になり、constructorがrepositoryとentityの2つ引数を取るが
 // entityのプロパティをそのままDBに反映させる使いやすさを目指したのでこれで割り切ることにする
 export function DynamodbAccessable<
-  TCondition extends ConditionBase,
   TEntity extends EntityBase,
   TCollection extends CollectionBase<TEntity>,
-  TRepository extends RepositoryBase<TCondition, TEntity, TCollection>,
->(
-  Base: Constructor<ServiceBase<TCondition, TEntity, TCollection, TRepository>>,
-) {
+  TRepository extends RepositoryBase<TEntity, TCollection>,
+>(Base: Constructor<ServiceBase<TEntity, TCollection, TRepository>>) {
   return class extends Base {
     async findBy(
       key: AWS.DynamoDB.DocumentClient.Key,
     ): Promise<TEntity | undefined> {
       const condition = {
-        getItemInput: {
-          Key: key,
-        },
-      } as TCondition;
+        Key: key,
+      } as GetItemInputBase;
 
       return await this.repository.getAsync(condition);
     }
@@ -49,20 +49,18 @@ export function DynamodbAccessable<
       delete attr.id;
 
       const condition = {
-        putItemInput: {
-          Item: attr,
-        },
-      } as TCondition;
+        Item: attr,
+      } as PutItemInputBase;
 
       return await this.repository.putAsync(condition);
     }
 
     async update(
       entity: TEntity,
-      customCondition?: TCondition,
+      customCondition?: UpdateItemInputBase,
     ): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput | undefined> {
       if (entity.id === undefined) {
-        throw new KeyNullException("idがセットされていません。");
+        throw new KeyNullException('idがセットされていません。');
       }
 
       if (!entity.validate()) {
@@ -103,7 +101,7 @@ export function DynamodbAccessable<
         ) {
           throw `更新Queryの発行に失敗しました。ExpressionAttributeNamesとExpressionAttributeValuesのkey数が合いません。\nExpressionAttributeNames: ${ExpressionAttributeNames} ExpressionAttributeValues: ${ExpressionAttributeValues}`;
         }
-        const UpdateExpression = "SET";
+        const UpdateExpression = 'SET';
 
         for (let i = 0; i < Object.keys(ExpressionAttributeNames).length; i++) {
           UpdateExpression.concat(
@@ -122,14 +120,14 @@ export function DynamodbAccessable<
 
       // 抽象化しているのでas unknown as TConditionは使わず型ガードしたかったが一旦as unknown as TConditionで対応
       // conditionのプロパティがオーバーライドなどで不適切になってもDynamo SDK側のエラーになるだけなので誤ったデータが入ることはないので割り切る
-      const condition: TCondition = {
-        updateItemInput: {
+      const condition = {
+        ...{
           Key: {
             id: entity.id,
           },
           ...buildDefaultUpdateQuery(entity),
         },
-      } as unknown as TCondition;
+      } as unknown as UpdateItemInputBase;
 
       // 自前のConditionがあれば優先
       return await this.repository.updateAsync(customCondition || condition);
@@ -141,16 +139,14 @@ export function DynamodbAccessable<
       // バリデーションは基本いらないはず
 
       if (entity.id === undefined) {
-        throw new KeyNullException("idがセットされていません。");
+        throw new KeyNullException('idがセットされていません。');
       }
 
       const condition = {
-        deleteItemInput: {
-          Key: {
-            id: entity.id,
-          },
+        Key: {
+          id: entity.id,
         },
-      } as unknown as TCondition;
+      } as unknown as DeleteItemInputBase;
 
       return await this.repository.deleteAsync(condition);
     }
@@ -160,17 +156,17 @@ export function DynamodbAccessable<
       KeyConditionExpression: string;
     } {
       const exAttributes: Item = {};
-      let KeyConditionExpression: string = "";
+      let KeyConditionExpression: string = '';
 
       for (const [key, value] of Object.entries(attributes)) {
-        exAttributes[":" + key] = value;
+        exAttributes[':' + key] = value;
         KeyConditionExpression = KeyConditionExpression.concat(
           `${key} = :${key}, `,
         );
       }
 
       // 最後のカンマを消す
-      KeyConditionExpression = KeyConditionExpression.replace(/, $/, "");
+      KeyConditionExpression = KeyConditionExpression.replace(/, $/, '');
 
       const ExpressionAttributeValues: Item = exAttributes;
 

@@ -1,4 +1,4 @@
-import { HttpBaseException } from "./HttpBaseException";
+import { HttpBaseException } from './HttpBaseException';
 export class UnprocessableEntityException extends HttpBaseException {
   /**
    * コンストラクタ

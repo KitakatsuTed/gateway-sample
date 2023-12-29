@@ -1,6 +1,6 @@
-import { EntityBase } from "../dynamodb/entities/entityBase";
+import { EntityBase } from '../dynamodb/entities/entityBase';
 
-export type Status = "incomplete" | "done";
+export type Status = 'incomplete' | 'done';
 
 // このディレクトリにはdynamo依存しないクラスも存在させることを許す
 // dynamo依存させるときはEntityBaseを継承すれば良い
@@ -25,7 +25,7 @@ export class Todo extends EntityBase {
 
   validate() {
     if (this.title && this.title.length > 100) {
-      this.errors.push({ title: "100文字以上は入力できません" });
+      this.errors.push({ title: '100文字以上は入力できません' });
     }
 
     return this.errors.length === 0;

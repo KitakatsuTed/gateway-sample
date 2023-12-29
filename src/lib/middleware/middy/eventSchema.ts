@@ -1,5 +1,5 @@
 export const eventDefaultSchema = {
-  type: "object",
+  type: 'object',
   properties: {
     pathParameters: {},
   },

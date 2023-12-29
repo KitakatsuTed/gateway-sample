@@ -1,4 +1,4 @@
-import middy from "@middy/core";
+import middy from '@middy/core';
 
 export function responseModelConverter(): middy.MiddlewareObj {
   return {
