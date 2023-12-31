@@ -316,10 +316,10 @@ export abstract class RepositoryBase<
   // 最新のシークエンス値を取得
   // 各テーブルの最新のid値を採番する
   // 若干雑な実装な気がするが一旦これで
-  private async getNewSequence(): Promise<number> {
+  private async getNewSequence(): Promise<string> {
     const params = {
       TableName: SEQUENCE_TABLE_NAME,
-      Key: { name: this.tableName },
+      Key: { tableName: this.tableName },
       updateItemInput: {
         UpdateExpression: 'set currentNumber = currentNumber + :val',
         ExpressionAttributeValues: {
@@ -329,11 +329,11 @@ export abstract class RepositoryBase<
       },
     };
 
-    const id = await this.dbContext.update(params).promise();
-    if (id.Attributes?.currentNumber === undefined) {
+    const updateItemOutput = await this.dbContext.update(params).promise();
+    if (updateItemOutput.Attributes?.currentNumber === undefined) {
       throw '最新のid取得に失敗しました。';
     }
 
-    return Number(id.Attributes?.currentNumber);
+    return String(updateItemOutput.Attributes?.currentNumber);
   }
 }

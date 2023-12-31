@@ -58,8 +58,8 @@ export function DynamodbAccessable<
     async update(
       entity: TEntity,
       customCondition?: UpdateItemInputBase,
-    ): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput | undefined> {
-      if (entity.id === undefined) {
+      ): Promise<{ response: AWS.DynamoDB.DocumentClient.UpdateItemOutput; entity: TEntity} | undefined> {
+        if (entity.id === undefined) {
         throw new KeyNullException('idがセットされていません。');
       }
 
@@ -67,6 +67,7 @@ export function DynamodbAccessable<
         return undefined; // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
       }
 
+      entity.updatedAt = DateTime.now().toMillis();
       // オブジェクトの現在のプロパティ値をそのまま全部使ってクエリを生成する
       // DBと同じ値だったとしても影響はないはず
       // 変更部分だけのクエリを用途ごとに実装しなくても良くなるはずなのでこれで良く、デフォルトが嫌なら自前でクエリを生成すれば良い。
@@ -82,7 +83,6 @@ export function DynamodbAccessable<
         // id,createdAt,updatedAtはライブラリ側で制御するので実装による変更は認めない
         delete attrs.id;
         delete attrs.createdAt;
-        attrs.updatedAt = DateTime.now().toMillis();
 
         const ExpressionAttributeNames = Object.fromEntries(
           Object.keys(attrs).map((key) => [`#${key}`, key]),
@@ -130,7 +130,12 @@ export function DynamodbAccessable<
       } as unknown as UpdateItemInputBase;
 
       // 自前のConditionがあれば優先
-      return await this.repository.updateAsync(customCondition || condition);
+      const response = await this.repository.updateAsync(customCondition || condition);
+
+      return {
+        response,
+        entity
+      }
     }
 
     async delete(

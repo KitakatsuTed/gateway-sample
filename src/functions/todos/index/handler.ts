@@ -16,7 +16,9 @@ async function main(
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todos,
+      data: {
+        todos: [...todos],
+      }
     },
   };
 }

@@ -38,7 +38,7 @@ export abstract class EntityBase implements IEntityBase {
     // 更新内容のプロパティが更新対象のオブジェクトのプロパティの一覧に含まれているかチェック
     // 16行目からasを利用するのでここでチェックをいれる
     attrKeys.forEach((key) => {
-      if (!targetProperties.includes(key) || []) {
+      if (!targetProperties.includes(key)) {
         throw new InvalidAttributeException(`attr: ${attr}`);
       }
     });

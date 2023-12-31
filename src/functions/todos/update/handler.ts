@@ -63,7 +63,7 @@ async function main(
       : undefined,
   });
 
-  const res = todoService.update(todo);
+  const res = await todoService.update(todo);
 
   if (!res) {
     throw new UnprocessableEntityException(undefined, todo.errors);
@@ -72,7 +72,7 @@ async function main(
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todo,
+      data: res.entity,
     },
   };
 }

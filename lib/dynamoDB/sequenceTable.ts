@@ -3,7 +3,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
 // テーブル名の定義
-export const SEQUENCE_TABLE_NAME = 'sequence'
+export const SEQUENCE_TABLE_NAME = 'sequences'
 
 export const buildSequenceTable = (scope: Construct) => {
   // 第２引数はStack内で一意
@@ -12,10 +12,10 @@ export const buildSequenceTable = (scope: Construct) => {
     tableName: SEQUENCE_TABLE_NAME,
     partitionKey: { //パーティションキーの定義
       name: 'id',
-      type: dynamodb.AttributeType.STRING,
+      type: dynamodb.AttributeType.NUMBER,
     },
     sortKey: { // ソートキーの定義
-      name: 'name',
+      name: 'tableName',
       type: dynamodb.AttributeType.STRING,
     },
   });

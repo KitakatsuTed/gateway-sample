@@ -12,7 +12,7 @@ export class TodoService extends DynamodbAccessable(
     ServiceBase<Entity, Collection, Repository>
   >,
 ) {
-  constructor(client?: AWS.DynamoDB.DocumentClient) {
-    super(new Repository(client || dynamodbClient));
+  constructor(repository: Repository = new Repository(dynamodbClient)) {
+    super(repository);
   }
 }

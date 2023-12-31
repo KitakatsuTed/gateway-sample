@@ -7,10 +7,6 @@
       "dom"
     ],
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@config/*": ["config/*"],
-    },
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
