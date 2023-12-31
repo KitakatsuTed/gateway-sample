@@ -40,7 +40,10 @@ export function DynamodbAccessable<
 
     async create(
       entity: TEntity,
-    ): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput | undefined> {
+    ): Promise<
+      | { response: AWS.DynamoDB.DocumentClient.PutItemOutput; entity: TEntity }
+      | undefined
+    > {
       if (!entity.validate()) {
         return undefined; // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
       }
@@ -52,14 +55,26 @@ export function DynamodbAccessable<
         Item: attr,
       } as PutItemInputBase;
 
-      return await this.repository.putAsync(condition);
+      const response = await this.repository.putAsync(condition);
+
+      entity.id = response.Attributes?.id;
+      entity.createdAt = response.Attributes?.createdAt;
+      entity.updatedAt = response.Attributes?.updatedAt;
+
+      return { response, entity };
     }
 
     async update(
       entity: TEntity,
       customCondition?: UpdateItemInputBase,
-      ): Promise<{ response: AWS.DynamoDB.DocumentClient.UpdateItemOutput; entity: TEntity} | undefined> {
-        if (entity.id === undefined) {
+    ): Promise<
+      | {
+          response: AWS.DynamoDB.DocumentClient.UpdateItemOutput;
+          entity: TEntity;
+        }
+      | undefined
+    > {
+      if (entity.id === undefined) {
         throw new KeyNullException('idがセットされていません。');
       }
 
@@ -130,12 +145,14 @@ export function DynamodbAccessable<
       } as unknown as UpdateItemInputBase;
 
       // 自前のConditionがあれば優先
-      const response = await this.repository.updateAsync(customCondition || condition);
+      const response = await this.repository.updateAsync(
+        customCondition || condition,
+      );
 
       return {
         response,
-        entity
-      }
+        entity,
+      };
     }
 
     async delete(

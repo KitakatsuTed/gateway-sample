@@ -1,7 +1,7 @@
 jest.mock('../../../../src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
 }));
-import { handler } from '../../../../src/functions/todos/update/handler';
+import { handler } from '../../../../src/functions/todos/create/handler';
 import * as TodoRepositoryModule from '../../../../src/lib/repositories/todoRepository';
 import { STATUS_CODE } from '../../../../src/lib/http/statusCode';
 import { Todo } from '../../../../src/lib/entities/todo';
@@ -14,22 +14,18 @@ describe('handler', () => {
   const now = DateTime.now()
   const spyNow = jest.spyOn(DateTime, 'now').mockImplementation(() => now);
 
-  const todo = new Todo(
-    '1',
-    'done',
-    'title',
-    'describe',
-    now.toMillis(),
-    now.minus({ days: 2 }).toMillis(),
-    now.minus({ days: 1 }).toMillis(),
-  )
   const mockedDateTime = jest.mocked(DateTime)
   mockedDateTime.now.mockReturnValue(now)
   const todoRepository = new TodoRepositoryModule.TodoRepository(dynamodbClient)
   const spyTodoRepository = jest.spyOn(TodoRepositoryModule, 'TodoRepository').mockImplementation(() => todoRepository)
   const mockedTodoRepository = jest.mocked(todoRepository)
-  mockedTodoRepository.getAsync.mockResolvedValue(todo)
-  mockedTodoRepository.updateAsync.mockResolvedValue({})
+  mockedTodoRepository.putAsync.mockResolvedValue({
+    Attributes: {
+      id: '1',
+      createdAt: now.toMillis(),
+      updatedAt: now.toMillis(),
+    }
+  })
 
   afterEach(() => {
     spyNow.mockReset();
@@ -37,14 +33,11 @@ describe('handler', () => {
   });
 
   const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-    pathParameters: {
-      id: '1'
-    },
     body: {
       status: 'incomplete',
-      title: 'updated title',
-      describe: 'updated describe',
-      doneAt: undefined,
+      title: 'title',
+      describe: 'describe',
+      doneAt: now.toMillis(),
     }
   }
 
@@ -58,10 +51,10 @@ describe('handler', () => {
           new Todo(
             '1',
             'incomplete',
-            'updated title',
-            'updated describe',
+            'title',
+            'describe',
             undefined,
-            now.minus({ days: 2 }).toMillis(),
+            now.toMillis(),
             now.toMillis(),
           )
       }

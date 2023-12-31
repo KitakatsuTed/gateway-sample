@@ -29,7 +29,7 @@ describe('handler', () => {
     spyTodoRepository.mockReset();
   });
 
-  const event: any = {
+  const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
     "pathParameters": '1'
   }
 

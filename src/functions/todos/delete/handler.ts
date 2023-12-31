@@ -40,7 +40,7 @@ async function main(
   return {
     statusCode: STATUS_CODE.NO_CONTENT,
     body: {
-      data: undefined
+      data: undefined,
     },
   };
 }

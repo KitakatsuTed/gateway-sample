@@ -18,7 +18,7 @@ async function main(
     body: {
       data: {
         todos: [...todos],
-      }
+      },
     },
   };
 }
