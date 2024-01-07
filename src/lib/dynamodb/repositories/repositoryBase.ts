@@ -10,6 +10,7 @@ import {
   UpdateItemInputBase,
 } from '../conditions';
 import { DateTime } from 'luxon';
+import { SEQUENCE_TABLE_NAME } from '../../../../lib/dynamoDB/sequenceTable';
 
 export interface IRepositoryBase<
   TEntity extends EntityBase,
@@ -28,8 +29,6 @@ export interface IRepositoryBase<
     condition: DeleteItemInputBase,
   ): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>;
 }
-
-const SEQUENCE_TABLE_NAME = 'sequence' as const;
 
 export abstract class RepositoryBase<
   TEntity extends EntityBase,
@@ -209,9 +208,6 @@ export abstract class RepositoryBase<
       updatedAt: DateTime.now().toMillis(),
     };
 
-    // パラメータコピー
-    Object.assign(params, condition);
-
     // 発行するクエリをログに出す
     console.log(params);
     // データ追加
@@ -320,20 +316,24 @@ export abstract class RepositoryBase<
     const params = {
       TableName: SEQUENCE_TABLE_NAME,
       Key: { tableName: this.tableName },
-      updateItemInput: {
-        UpdateExpression: 'set currentNumber = currentNumber + :val',
-        ExpressionAttributeValues: {
-          ':val': 1,
-        },
-        ReturnValues: 'UPDATED_NEW',
+      UpdateExpression: `ADD #currentNumber :val`,
+      ExpressionAttributeNames: {
+        '#currentNumber': "currentNumber",
       },
+      ExpressionAttributeValues: {
+        ':val': 1,
+      },
+      ReturnValues: 'UPDATED_NEW',
     };
 
-    const updateItemOutput = await this.dbContext.update(params).promise();
-    if (updateItemOutput.Attributes?.currentNumber === undefined) {
-      throw '最新のid取得に失敗しました。';
-    }
+    console.log(params)
 
-    return String(updateItemOutput.Attributes?.currentNumber);
+    const updateItemOutput = await this.dbContext.update(params).promise();
+    // if (updateItemOutput.Attributes?.currentNumber === undefined) {
+    //   throw '最新のid取得に失敗しました。';
+    // }
+
+    return String(updateItemOutput?.Attributes?.currentNumber || 0);
+    // return String(updateItemOutput.Attributes.currentNumber);
   }
 }

@@ -11,10 +11,6 @@ export const buildSequenceTable = (scope: Construct) => {
     ...defaultOptions,
     tableName: SEQUENCE_TABLE_NAME,
     partitionKey: { //パーティションキーの定義
-      name: 'id',
-      type: dynamodb.AttributeType.NUMBER,
-    },
-    sortKey: { // ソートキーの定義
       name: 'tableName',
       type: dynamodb.AttributeType.STRING,
     },

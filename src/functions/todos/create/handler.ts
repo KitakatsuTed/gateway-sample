@@ -20,6 +20,7 @@ export const eventSchema = {
           type: 'string',
         },
         status: {
+          type: 'string',
           enum: ['incomplete', 'done'],
         },
       },
@@ -51,7 +52,7 @@ async function main(
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todo,
+      data: res.entity,
     },
   };
 }

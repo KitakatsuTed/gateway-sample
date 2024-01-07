@@ -1,14 +1,15 @@
-jest.mock('../../../../src/lib/middleware/middy/middify.ts', () => ({
+jest.mock('src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
 }));
-import { handler } from '../../../../src/functions/todos/create/handler';
-import * as TodoRepositoryModule from '../../../../src/lib/repositories/todoRepository';
-import { STATUS_CODE } from '../../../../src/lib/http/statusCode';
-import { Todo } from '../../../../src/lib/entities/todo';
+import { handler } from 'src/functions/todos/create/handler';
+import * as TodoRepositoryModule from 'src/lib/repositories/todoRepository';
+import { STATUS_CODE } from 'src/lib/http/statusCode';
+import { Todo } from 'src/lib/entities/todo';
 import { DateTime } from 'luxon';
-import { dynamodbClient } from '../../../../src/lib/dynamodb/clients/dynamodb';
+import { dynamodbClient } from 'src/lib/dynamodb/clients/dynamodb';
+import { UnprocessableEntityException } from 'src/lib/exceptions/http/UnprocessableEntityException';
 
-jest.mock("../../../../src/lib/repositories/todoRepository.ts")
+jest.mock("src/lib/repositories/todoRepository.ts")
 
 describe('handler', () => {
   const now = DateTime.now()
@@ -32,16 +33,15 @@ describe('handler', () => {
     spyTodoRepository.mockReset();
   });
 
-  const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-    body: {
-      status: 'incomplete',
-      title: 'title',
-      describe: 'describe',
-      doneAt: now.toMillis(),
-    }
-  }
-
   test('正常系', async () => {
+    const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      body: {
+        status: 'incomplete',
+        title: 'title',
+        describe: 'describe',
+        doneAt: now.toMillis(),
+      }
+    }
     const actual = await handler.handler(event)
 
     expect(actual).toEqual({
@@ -59,5 +59,17 @@ describe('handler', () => {
           )
       }
     })
+  })
+
+  test('バリデーションエラー', async () => {
+    const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      body: {
+        status: 'incomplete',
+        title: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        describe: 'describe',
+        doneAt: now.toMillis(),
+      }
+    }
+    await expect(handler.handler(event)).rejects.toThrow(UnprocessableEntityException);
   })
 })

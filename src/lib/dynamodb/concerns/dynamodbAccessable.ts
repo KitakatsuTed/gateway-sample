@@ -50,6 +50,7 @@ export function DynamodbAccessable<
 
       const attr = getAttributes(entity);
       delete attr.id;
+      delete attr.errors;
 
       const condition = {
         Item: attr,
@@ -98,15 +99,13 @@ export function DynamodbAccessable<
         // id,createdAt,updatedAtはライブラリ側で制御するので実装による変更は認めない
         delete attrs.id;
         delete attrs.createdAt;
+        delete attrs.errors;
 
         const ExpressionAttributeNames = Object.fromEntries(
           Object.keys(attrs).map((key) => [`#${key}`, key]),
         );
         const ExpressionAttributeValues = Object.fromEntries(
-          Object.keys(attrs).map((key) => [
-            `:${key}`,
-            entity[key as keyof TEntity],
-          ]),
+          Object.keys(attrs).map((key) => [`:${key}`, key]),
         );
 
         // 基本的に数が合わないことはないが合っていなければ、想定外の更新結果になるので弾いておく
@@ -116,15 +115,17 @@ export function DynamodbAccessable<
         ) {
           throw `更新Queryの発行に失敗しました。ExpressionAttributeNamesとExpressionAttributeValuesのkey数が合いません。\nExpressionAttributeNames: ${ExpressionAttributeNames} ExpressionAttributeValues: ${ExpressionAttributeValues}`;
         }
-        const UpdateExpression = 'SET';
+        let UpdateExpression = 'SET ';
 
         for (let i = 0; i < Object.keys(ExpressionAttributeNames).length; i++) {
-          UpdateExpression.concat(
+          UpdateExpression = UpdateExpression.concat(
             `${Object.keys(ExpressionAttributeNames)[i]} = ${Object.keys(
               ExpressionAttributeValues,
-            )}`,
+            )[i]}, `,
           );
         }
+        // 最後のカンマとスペースを削除
+        UpdateExpression = UpdateExpression.slice(0, -2) 
 
         return {
           UpdateExpression,

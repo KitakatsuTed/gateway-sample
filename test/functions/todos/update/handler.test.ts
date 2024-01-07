@@ -1,14 +1,15 @@
-jest.mock('../../../../src/lib/middleware/middy/middify.ts', () => ({
+jest.mock('src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
 }));
-import { handler } from '../../../../src/functions/todos/update/handler';
-import * as TodoRepositoryModule from '../../../../src/lib/repositories/todoRepository';
-import { STATUS_CODE } from '../../../../src/lib/http/statusCode';
-import { Todo } from '../../../../src/lib/entities/todo';
+import { handler } from 'src/functions/todos/update/handler';
+import * as TodoRepositoryModule from 'src/lib/repositories/todoRepository';
+import { STATUS_CODE } from 'src/lib/http/statusCode';
+import { Todo } from 'src/lib/entities/todo';
 import { DateTime } from 'luxon';
-import { dynamodbClient } from '../../../../src/lib/dynamodb/clients/dynamodb';
+import { dynamodbClient } from 'src/lib/dynamodb/clients/dynamodb';
+import { UnprocessableEntityException } from 'src/lib/exceptions/http/UnprocessableEntityException';
 
-jest.mock("../../../../src/lib/repositories/todoRepository.ts")
+jest.mock("src/lib/repositories/todoRepository.ts")
 
 describe('handler', () => {
   const now = DateTime.now()
@@ -26,35 +27,34 @@ describe('handler', () => {
   const mockedDateTime = jest.mocked(DateTime)
   mockedDateTime.now.mockReturnValue(now)
   const todoRepository = new TodoRepositoryModule.TodoRepository(dynamodbClient)
-  const spyTodoRepository = jest.spyOn(TodoRepositoryModule, 'TodoRepository').mockImplementation(() => todoRepository)
+  const spyOnTodoRepository = jest.spyOn(TodoRepositoryModule, 'TodoRepository').mockImplementation(() => todoRepository)
   const mockedTodoRepository = jest.mocked(todoRepository)
   mockedTodoRepository.getAsync.mockResolvedValue(todo)
   mockedTodoRepository.updateAsync.mockResolvedValue({})
 
   afterEach(() => {
-    spyNow.mockReset();
-    spyTodoRepository.mockReset();
-  });
-
-  const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-    pathParameters: {
-      id: '1'
-    },
-    body: {
-      status: 'incomplete',
-      title: 'updated title',
-      describe: 'updated describe',
-      doneAt: undefined,
-    }
-  }
+    spyNow.mockClear()
+    spyOnTodoRepository.mockClear()
+  })
 
   test('正常系', async () => {
+    const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      pathParameters: {
+        id: '1'
+      },
+      body: {
+        status: 'incomplete',
+        title: 'updated title',
+        describe: 'updated describe',
+        doneAt: undefined,
+      }
+    }
     const actual = await handler.handler(event)
 
     expect(actual).toEqual({
       statusCode: STATUS_CODE.OK,
       body: {
-        data: 
+        data:
           new Todo(
             '1',
             'incomplete',
@@ -66,5 +66,20 @@ describe('handler', () => {
           )
       }
     })
+  })
+
+  test('バリデーションエラー', async () => {
+    const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      pathParameters: {
+        id: '1'
+      },
+      body: {
+        status: 'incomplete',
+        title: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        describe: 'updated describe',
+        doneAt: undefined,
+      }
+    }
+    await expect(handler.handler(event)).rejects.toThrow(UnprocessableEntityException);
   })
 })

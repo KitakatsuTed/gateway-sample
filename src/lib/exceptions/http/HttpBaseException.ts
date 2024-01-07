@@ -21,7 +21,7 @@ export abstract class HttpBaseException extends Error {
     const errorMessage = `${this.getMessageByErrorCode()}: ${this.message}`;
     const details = this.details;
 
-    console.error('StatusCode: ' + statusCode);
+    console.error('StatusCode: ' + `${statusCode}`);
     console.error('ErrorType: ' + errorType);
     console.error('ErrorMessage: ' + errorMessage);
     console.error('Details: ' + details);

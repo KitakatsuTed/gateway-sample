@@ -1,14 +1,14 @@
-jest.mock('../../../../src/lib/middleware/middy/middify.ts', () => ({
+jest.mock('src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
 }));
-import { handler } from '../../../../src/functions/todos/delete/handler';
-import * as TodoRepositoryModule from '../../../../src/lib/repositories/todoRepository';
-import { STATUS_CODE } from '../../../../src/lib/http/statusCode';
-import { Todo } from '../../../../src/lib/entities/todo';
+import { handler } from 'src/functions/todos/delete/handler';
+import * as TodoRepositoryModule from 'src/lib/repositories/todoRepository';
+import { STATUS_CODE } from 'src/lib/http/statusCode';
+import { Todo } from 'src/lib/entities/todo';
 import { DateTime } from 'luxon';
-import { dynamodbClient } from '../../../../src/lib/dynamodb/clients/dynamodb';
+import { dynamodbClient } from 'src/lib/dynamodb/clients/dynamodb';
 
-jest.mock("../../../../src/lib/repositories/todoRepository.ts")
+jest.mock("src/lib/repositories/todoRepository.ts")
 
 describe('handler', () => {
   const now = DateTime.now()
