@@ -2,10 +2,10 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { restApi } from './apiGateway/restApi';
-import { defineApiGatewayTodo } from './apiGateway/todos';
 import { buildRoutes } from './apiGateway/routes';
 import { dynamoTables } from './dynamoDB';
 import { buildIamRoles } from './iamRole';
+import { defineApiGateway } from './apiGateway';
 
 export class GatewaySampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -15,7 +15,7 @@ export class GatewaySampleStack extends cdk.Stack {
     const router = buildRoutes(restApiObj)
     const iamRoles = buildIamRoles(this)
 
-    defineApiGatewayTodo(this, router, iamRoles)
+    defineApiGateway(this, router, iamRoles)
     dynamoTables(this)
   }
 }
