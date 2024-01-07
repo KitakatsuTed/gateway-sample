@@ -1,18 +1,12 @@
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
-import { functionUserCreate, functionUserDelete, functionUserDetail, functionUserIndex, functionUserUpdate } from '../../lambda/users';
+import { functionUserCreate, functionUserDelete, functionUserDetail, functionUserUpdate } from '../../lambda/users';
 import { RouteMapping } from '../routes';
 import { IamRoles } from '../../iamRole';
 
 export const resourceNameUser = 'users'
 
 export const defineApiGatewayUser = (scope: Construct, route: RouteMapping, iamRoles: IamRoles): void => {
-  //リソースにGETメソッド、Lambda統合プロキシを指定
-  route.apiUsers.addMethod(
-    'GET',
-    new LambdaIntegration(functionUserIndex(scope, iamRoles.lambdaBasicRole))
-  );
-
   route.apiUser.addMethod(
     'GET',
     new LambdaIntegration(functionUserDetail(scope, iamRoles.lambdaBasicRole)),
