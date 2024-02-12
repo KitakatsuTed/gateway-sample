@@ -1,11 +1,11 @@
 import * as AWS from 'aws-sdk';
 import { RepositoryBase } from '../dynamodb/repositories/repositoryBase';
-import { User as Entity } from '../entities/user';
-import { UserCollection as Collection } from '../collections/userCollection';
-import { USERS_TABLE_NAME } from '../../../lib/dynamoDB/usersTable';
+import { UserAccount as Entity } from '../entities/userAccount';
+import { UserAccountCollection as Collection } from '../collections/userAccountCollection';
+import { USER_ACCOUNTS_TABLE_NAME } from '../../../lib/dynamoDB/userAccountsTable';
 
-export class UserRepository extends RepositoryBase<Entity, Collection> {
-  protected tableName: string = USERS_TABLE_NAME;
+export class UserAccountRepository extends RepositoryBase<Entity, Collection> {
+  protected tableName: string = USER_ACCOUNTS_TABLE_NAME;
 
   protected getEntity(
     item?: AWS.DynamoDB.DocumentClient.AttributeMap,
@@ -17,9 +17,8 @@ export class UserRepository extends RepositoryBase<Entity, Collection> {
     // ここはitemのプロパティの型とEntityのinterfaceの型が同じであることをチェックしたい
     return new Entity(
       item.id,
-      item.name,
-      item.age,
-      item.status,
+      item.email,
+      item.password,
       item.createdAt,
       item.updatedAt,
     );

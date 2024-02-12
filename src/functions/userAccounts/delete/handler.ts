@@ -2,8 +2,7 @@ import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
-import { TodoService } from '../../../lib/services/todoService';
-import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
+import { DeleteUserAccountService } from 'src/lib/services/useCases/deleteUserAccountService';
 
 export const eventSchema = {
   type: 'object',
@@ -25,22 +24,15 @@ export const eventSchema = {
 async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
-  const todoService = new TodoService();
-
-  const todo = await todoService.findBy({ id: request.pathParameters.id });
-
-  if (todo === undefined) {
-    throw new NotFoundException(
-      `Couldn't find Todo with ${request.pathParameters.id}`,
-    );
-  }
-
-  await todoService.delete(todo);
+  const deleteUserAccountService = new DeleteUserAccountService();
+  await deleteUserAccountService.execute({
+    userAccountId: request.pathParameters.id,
+  });
 
   return {
     statusCode: STATUS_CODE.NO_CONTENT,
     body: {
-      data: undefined,
+      data: {},
     },
   };
 }

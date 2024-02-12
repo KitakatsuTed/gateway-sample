@@ -3,7 +3,7 @@ import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
 import { TodoService } from '../../../lib/services/todoService';
-import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
+import { NotFoundException } from '../../../lib/exceptions/NotFoundException';
 
 export const eventSchema = {
   type: 'object',

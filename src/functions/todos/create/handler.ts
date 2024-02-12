@@ -4,7 +4,7 @@ import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
 import { TodoService } from '../../../lib/services/todoService';
 import { Todo } from '../../../lib/entities/todo';
-import { UnprocessableEntityException } from '../../../lib/exceptions/http/UnprocessableEntityException';
+import { UnprocessableEntityException } from '../../../lib/exceptions/UnprocessableEntityException';
 
 export const eventSchema = {
   type: 'object',

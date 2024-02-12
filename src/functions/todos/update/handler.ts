@@ -3,9 +3,9 @@ import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
 import { TodoService } from '../../../lib/services/todoService';
-import { UnprocessableEntityException } from '../../../lib/exceptions/http/UnprocessableEntityException';
+import { UnprocessableEntityException } from '../../../lib/exceptions/UnprocessableEntityException';
 import { DateTime } from 'luxon';
-import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
+import { NotFoundException } from '../../../lib/exceptions/NotFoundException';
 
 export const eventSchema = {
   type: 'object',
@@ -65,7 +65,7 @@ async function main(
 
   const res = await todoService.update(todo);
 
-  if (!res) {
+  if (res.response === undefined) {
     throw new UnprocessableEntityException(undefined, todo.errors);
   }
 

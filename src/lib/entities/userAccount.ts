@@ -1,42 +1,36 @@
 import { EntityBase } from '../dynamodb/entities/entityBase';
 
-export enum UserStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-}
-
 // このディレクトリにはdynamo依存しないクラスも存在させることを許す
 // dynamo依存させるときはEntityBaseを継承すれば良い
-export class User extends EntityBase {
+export class UserAccount extends EntityBase {
   constructor(
     public id: string | undefined,
-    public name: string,
-    public age: number,
-    public status: UserStatus,
+    public email: string,
+    public password: string,
+    public userId: string,
     public createdAt?: number | undefined,
     public updatedAt?: number | undefined,
   ) {
     super(id, createdAt, updatedAt);
-    this.name = name;
-    this.status = status;
-    this.age = age;
+    this.email = email;
+    this.password = password;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
 
   validate() {
     // check presence
-    const requiredAttrs: (keyof User)[] = ['name', 'status', 'age'];
+    const requiredAttrs: (keyof UserAccount)[] = [
+      'email',
+      'password',
+      'userId',
+    ];
     requiredAttrs.forEach((attr) => {
       if (!this[attr]) {
         this.errors.push({ [attr]: '入力してください' });
       }
     });
 
-    if (this.age < 1) {
-      this.errors.push({ age: '年齢は0より大きい値で入力してください' });
-    }
-
-    return this.errors.length === 0;
+    return !this.hasError();
   }
 }

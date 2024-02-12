@@ -2,8 +2,7 @@ import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
-import { TodoService } from '../../../lib/services/todoService';
-import { NotFoundException } from '../../../lib/exceptions/NotFoundException';
+import { UpdateUserAccountService } from '../../../lib/services/useCases/updateUserAccountService';
 
 export const eventSchema = {
   type: 'object',
@@ -17,29 +16,41 @@ export const eventSchema = {
       },
       required: ['id'],
     },
+    body: {
+      type: 'object',
+      properties: {
+        email: {
+          type: 'string',
+        },
+        password: {
+          type: 'string',
+        },
+        passwordConfirmation: {
+          type: 'string',
+        },
+      },
+      required: ['email', 'password', 'passwordConfirmation'],
+    },
   },
-  required: ['pathParameters'],
+  required: ['pathParameters', 'body'],
 } as const;
 
 // request: eventSchema.property で型付けされている。
 async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
-  const todoService = new TodoService();
-
-  // 自前で実装したい人はgetAsyncを直接使えば良い
-  const todo = await todoService.findBy({ id: request.pathParameters.id });
-
-  if (todo === undefined) {
-    throw new NotFoundException(
-      `Couldn't find Todo with ${request.pathParameters.id}`,
-    );
-  }
+  const updateUserAccountService = new UpdateUserAccountService();
+  const userAccount = await updateUserAccountService.execute({
+    userAccountId: request.pathParameters.id,
+    email: request.body.email,
+    password: request.body.password,
+    passwordConfirmation: request.body.passwordConfirmation,
+  });
 
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todo,
+      data: userAccount,
     },
   };
 }

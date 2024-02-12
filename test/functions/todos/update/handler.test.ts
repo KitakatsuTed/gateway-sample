@@ -7,7 +7,7 @@ import { STATUS_CODE } from 'src/lib/http/statusCode';
 import { Todo } from 'src/lib/entities/todo';
 import { DateTime } from 'luxon';
 import { dynamodbClient } from 'src/lib/dynamodb/clients/dynamodb';
-import { UnprocessableEntityException } from 'src/lib/exceptions/http/UnprocessableEntityException';
+import { UnprocessableEntityException } from 'src/lib/exceptions/UnprocessableEntityException';
 
 jest.mock("src/lib/repositories/todoRepository.ts")
 

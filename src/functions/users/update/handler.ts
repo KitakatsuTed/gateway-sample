@@ -2,10 +2,9 @@ import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
-import { TodoService } from '../../../lib/services/todoService';
-import { UnprocessableEntityException } from '../../../lib/exceptions/http/UnprocessableEntityException';
-import { DateTime } from 'luxon';
-import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
+import { UserService } from '../../../lib/services/userService';
+import { UnprocessableEntityException } from '../../../lib/exceptions/UnprocessableEntityException';
+import { NotFoundException } from '../../../lib/exceptions/NotFoundException';
 
 export const eventSchema = {
   type: 'object',
@@ -22,16 +21,13 @@ export const eventSchema = {
     body: {
       type: 'object',
       properties: {
-        title: {
+        name: {
           type: 'string',
         },
-        describe: {
-          type: 'string',
+        age: {
+          type: 'number',
         },
         status: {
-          enum: ['incomplete', 'done'],
-        },
-        doneAt: {
           type: 'string',
         },
       },
@@ -45,28 +41,25 @@ export const eventSchema = {
 async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
-  const todoService = new TodoService();
-  const todo = await todoService.findBy({ id: request.pathParameters.id });
+  const userService = new UserService();
+  const user = await userService.findBy({ id: request.pathParameters.id });
 
-  if (todo === undefined) {
+  if (user === undefined) {
     throw new NotFoundException(
-      `Couldn't find Todo with ${request.pathParameters.id}`,
+      `Couldn't find User with ${request.pathParameters.id}`,
     );
   }
 
-  todo.assignAttribute({
-    title: request.body.title,
-    describe: request.body.describe,
+  user.assignAttribute({
+    name: request.body.name,
+    age: request.body.age,
     status: request.body.status,
-    doneAt: request.body.doneAt
-      ? DateTime.fromISO(request.body.doneAt).toMillis()
-      : undefined,
   });
 
-  const res = await todoService.update(todo);
+  const res = await userService.update(user);
 
-  if (!res) {
-    throw new UnprocessableEntityException(undefined, todo.errors);
+  if (res.entity.hasError()) {
+    throw new UnprocessableEntityException(undefined, user.errors);
   }
 
   return {

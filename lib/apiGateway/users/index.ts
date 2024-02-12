@@ -1,6 +1,6 @@
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
-import { functionUserCreate, functionUserDelete, functionUserDetail, functionUserUpdate } from '../../lambda/users';
+import { functionUserDetail, functionUserUpdate } from '../../lambda/users';
 import { RouteMapping } from '../routes';
 import { IamRoles } from '../../iamRole';
 
@@ -11,16 +11,9 @@ export const defineApiGatewayUser = (scope: Construct, route: RouteMapping, iamR
     'GET',
     new LambdaIntegration(functionUserDetail(scope, iamRoles.lambdaBasicRole)),
     {
-      requestValidatorOptions: {
-        validateRequestParameters: true,
+      requestParameters: {
+        'method.request.path.id': true,
       },
-    }
-  );
-
-  route.apiUser.addMethod(
-    'POST',
-    new LambdaIntegration(functionUserCreate(scope, iamRoles.lambdaBasicRole)),
-    {
       requestValidatorOptions: {
         validateRequestParameters: true,
       },
@@ -31,16 +24,9 @@ export const defineApiGatewayUser = (scope: Construct, route: RouteMapping, iamR
     'PATCH',
     new LambdaIntegration(functionUserUpdate(scope, iamRoles.lambdaBasicRole)),
     {
-      requestValidatorOptions: {
-        validateRequestParameters: true,
+      requestParameters: {
+        'method.request.path.id': true,
       },
-    }
-  );
-
-  route.apiUser.addMethod(
-    'DELETE',
-    new LambdaIntegration(functionUserDelete(scope, iamRoles.lambdaBasicRole)),
-    {
       requestValidatorOptions: {
         validateRequestParameters: true,
       },

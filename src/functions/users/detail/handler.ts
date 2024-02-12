@@ -2,8 +2,8 @@ import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
-import { TodoService } from '../../../lib/services/todoService';
-import { NotFoundException } from '../../../lib/exceptions/http/NotFoundException';
+import { UserService } from '../../../lib/services/userService';
+import { NotFoundException } from '../../../lib/exceptions/NotFoundException';
 
 export const eventSchema = {
   type: 'object',
@@ -25,21 +25,21 @@ export const eventSchema = {
 async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
-  const todoService = new TodoService();
+  const userService = new UserService();
 
   // 自前で実装したい人はgetAsyncを直接使えば良い
-  const todo = await todoService.findBy({ id: request.pathParameters.id });
+  const user = await userService.findBy({ id: request.pathParameters.id });
 
-  if (todo === undefined) {
+  if (user === undefined) {
     throw new NotFoundException(
-      `Couldn't find Todo with ${request.pathParameters.id}`,
+      `Couldn't find User with ${request.pathParameters.id}`,
     );
   }
 
   return {
     statusCode: STATUS_CODE.OK,
     body: {
-      data: todo,
+      data: user,
     },
   };
 }

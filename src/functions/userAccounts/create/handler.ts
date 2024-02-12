@@ -2,9 +2,7 @@ import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
-import { TodoService } from '../../../lib/services/todoService';
-import { Todo } from '../../../lib/entities/todo';
-import { UnprocessableEntityException } from '../../../lib/exceptions/http/UnprocessableEntityException';
+import { RegistrationService } from 'src/lib/services/useCases/registrationService';
 
 export const eventSchema = {
   type: 'object',
@@ -13,18 +11,23 @@ export const eventSchema = {
     body: {
       type: 'object',
       properties: {
-        title: {
+        name: {
           type: 'string',
         },
-        describe: {
+        age: {
+          type: 'number',
+        },
+        email: {
           type: 'string',
         },
-        status: {
+        password: {
           type: 'string',
-          enum: ['incomplete', 'done'],
+        },
+        passwordConfirmation: {
+          type: 'string',
         },
       },
-      required: ['status'],
+      required: ['name', 'age', 'email', 'password', 'passwordConfirmation'],
     },
   },
   required: ['body'],
@@ -34,26 +37,18 @@ export const eventSchema = {
 async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
-  // idに当たる引数をundefinedにするのはちょっと気持ち悪いけど、idは第一引数にいて欲しいので我慢する
-  const todo = new Todo(
-    undefined,
-    request.body.status,
-    request.body.title,
-    request.body.describe,
-    undefined,
-  );
-  const todoService = new TodoService();
-  const res = await todoService.create(todo);
-
-  if (!res) {
-    throw new UnprocessableEntityException(undefined, todo.errors);
-  }
+  const registrationService = new RegistrationService();
+  await registrationService.execute({
+    name: request.body.name,
+    age: request.body.age,
+    email: request.body.email,
+    password: request.body.password,
+    passwordConfirmation: request.body.passwordConfirmation,
+  });
 
   return {
     statusCode: STATUS_CODE.OK,
-    body: {
-      data: res.entity,
-    },
+    body: {},
   };
 }
 

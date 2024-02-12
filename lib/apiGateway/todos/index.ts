@@ -10,7 +10,15 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
   //リソースにGETメソッド、Lambda統合プロキシを指定
   route.apiTodos.addMethod(
     'GET',
-    new LambdaIntegration(functionTodoIndex(scope, iamRoles.lambdaBasicRole))
+    new LambdaIntegration(functionTodoIndex(scope, iamRoles.lambdaBasicRole)),
+    {
+      requestParameters: {
+        'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+      },
+      requestValidatorOptions: {
+        validateRequestParameters: true,
+      },
+    }
   );
 
   route.apiTodo.addMethod(
@@ -18,7 +26,8 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     new LambdaIntegration(functionTodoDetail(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
-        'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+        'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+        'method.request.path.id': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,
@@ -30,6 +39,9 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     'POST',
     new LambdaIntegration(functionTodoCreate(scope, iamRoles.lambdaBasicRole)),
     {
+      requestParameters: {
+        'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+      },
       requestValidatorOptions: {
         validateRequestParameters: true,
       },
@@ -41,7 +53,8 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     new LambdaIntegration(functionTodoUpdate(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
-        'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+        'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+        'method.request.path.id': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,
@@ -54,7 +67,8 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     new LambdaIntegration(functionTodoDelete(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
-        'method.request.path.id': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+        'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
+        'method.request.path.id': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,

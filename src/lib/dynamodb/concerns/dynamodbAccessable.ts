@@ -1,9 +1,9 @@
 import { EntityBase } from '../entities/entityBase';
 import {
-  DeleteItemInputBase,
   GetItemInputBase,
-  PutItemInputBase,
+  DeleteItemInputBase,
   UpdateItemInputBase,
+  PutItemInputBase,
 } from '../conditions';
 import { CollectionBase } from '../collections/collectionBase';
 import { RepositoryBase } from '../repositories/repositoryBase';
@@ -13,6 +13,7 @@ import { getAttributes } from '../utility/getAttributes';
 import { ServiceBase } from '../services/serviceBase';
 import { DateTime } from 'luxon';
 import { Constructor } from './Constructor';
+import { PutItemInput, DeleteItemInput, TransactWriteItemsInput, TransactWriteItemsOutput } from 'aws-sdk/clients/dynamodb';
 
 type Item = {
   [key: string]: AttributeValue;
@@ -68,19 +69,19 @@ export function DynamodbAccessable<
     async update(
       entity: TEntity,
       customCondition?: UpdateItemInputBase,
-    ): Promise<
-      | {
-          response: AWS.DynamoDB.DocumentClient.UpdateItemOutput;
-          entity: TEntity;
-        }
-      | undefined
-    > {
+    ): Promise<{
+      response: AWS.DynamoDB.DocumentClient.UpdateItemOutput | undefined;
+      entity: TEntity;
+    }> {
       if (entity.id === undefined) {
         throw new KeyNullException('idがセットされていません。');
       }
 
       if (!entity.validate()) {
-        return undefined; // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
+        return {
+          response: undefined,
+          entity: entity,
+        }; // ここでthis.errorsにはエラーが入る想定なので呼び出し側で条件分なりでハンドルする
       }
 
       entity.updatedAt = DateTime.now().toMillis();
@@ -119,13 +120,13 @@ export function DynamodbAccessable<
 
         for (let i = 0; i < Object.keys(ExpressionAttributeNames).length; i++) {
           UpdateExpression = UpdateExpression.concat(
-            `${Object.keys(ExpressionAttributeNames)[i]} = ${Object.keys(
-              ExpressionAttributeValues,
-            )[i]}, `,
+            `${Object.keys(ExpressionAttributeNames)[i]} = ${
+              Object.keys(ExpressionAttributeValues)[i]
+            }, `,
           );
         }
         // 最後のカンマとスペースを削除
-        UpdateExpression = UpdateExpression.slice(0, -2) 
+        UpdateExpression = UpdateExpression.slice(0, -2);
 
         return {
           UpdateExpression,
@@ -174,6 +175,12 @@ export function DynamodbAccessable<
       return await this.repository.deleteAsync(condition);
     }
 
+    async transactWrite(
+      params: TransactWriteItemsInput,
+      ): Promise<TransactWriteItemsOutput> {
+        return await this.repository.transactWriteAsync(params);
+      }
+
     buildQueryInput(attributes: object): {
       ExpressionAttributeValues: Item;
       KeyConditionExpression: string;
@@ -194,6 +201,29 @@ export function DynamodbAccessable<
       const ExpressionAttributeValues: Item = exAttributes;
 
       return { ExpressionAttributeValues, KeyConditionExpression };
+    }
+
+    async buildPutQuery(entity: TEntity): Promise<PutItemInput> {
+      const attr = getAttributes(entity);
+      delete attr.id;
+      delete attr.errors;
+
+      const condition = {
+        Item: attr,
+      } as PutItemInputBase;
+
+      const PutItemInput = await this.repository.buildPutQuery(condition);
+      return PutItemInput;
+    }
+
+    buildDeleteQuery(entity: TEntity): DeleteItemInput {
+      const condition: DeleteItemInputBase = {
+        Key: { id: entity.id as unknown as AttributeValue },
+      };
+
+      const deleteItemInput = this.repository.buildDeleteQuery(condition);
+
+      return deleteItemInput;
     }
 
     validate(entity: TEntity): boolean {

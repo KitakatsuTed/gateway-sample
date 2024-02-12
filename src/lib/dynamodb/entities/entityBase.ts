@@ -31,6 +31,10 @@ export abstract class EntityBase implements IEntityBase {
     return !!this.id;
   }
 
+  hasError(): boolean {
+    return this.errors.length > 0;
+  }
+
   assignAttribute(attr: object): void {
     const targetProperties = getClassProperties(this);
     const attrKeys = Object.keys(attr);
@@ -39,7 +43,7 @@ export abstract class EntityBase implements IEntityBase {
     // 16行目からasを利用するのでここでチェックをいれる
     attrKeys.forEach((key) => {
       if (!targetProperties.includes(key)) {
-        throw new InvalidAttributeException(`attr: ${attr}`);
+        throw new InvalidAttributeException(`attr: ${key}`);
       }
     });
 

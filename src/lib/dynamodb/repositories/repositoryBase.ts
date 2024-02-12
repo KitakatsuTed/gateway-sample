@@ -11,6 +11,7 @@ import {
 } from '../conditions';
 import { DateTime } from 'luxon';
 import { SEQUENCE_TABLE_NAME } from '../../../../lib/dynamoDB/sequenceTable';
+import { PutItemInput, DeleteItemInput, TransactWriteItemsInput, TransactWriteItemsOutput } from 'aws-sdk/clients/dynamodb';
 
 export interface IRepositoryBase<
   TEntity extends EntityBase,
@@ -28,6 +29,10 @@ export interface IRepositoryBase<
   deleteAsync(
     condition: DeleteItemInputBase,
   ): Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>;
+  transactWriteAsync(
+    condition: TransactWriteItemsInput,
+  ): Promise<TransactWriteItemsOutput>;
+  getSequence(): Promise<string>;
 }
 
 export abstract class RepositoryBase<
@@ -194,19 +199,7 @@ export abstract class RepositoryBase<
     condition: PutItemInputBase,
   ): Promise<AWS.DynamoDB.DocumentClient.PutItemOutput> {
     // DynamoDB putItemパラメータ設定
-    const params: AWS.DynamoDB.DocumentClient.PutItemInput = {
-      TableName: this.tableName,
-      Item: condition.Item,
-    };
-
-    const newId = await this.getNewSequence();
-
-    params.Item = {
-      ...params.Item,
-      id: newId,
-      createdAt: DateTime.now().toMillis(),
-      updatedAt: DateTime.now().toMillis(),
-    };
+    const params = await this.buildPutQuery(condition);
 
     // 発行するクエリをログに出す
     console.log(params);
@@ -261,6 +254,73 @@ export abstract class RepositoryBase<
     // 削除
     return this.dbContext.delete(params).promise();
   }
+  
+  public async transactWriteAsync(
+    params: TransactWriteItemsInput,
+    ): Promise<TransactWriteItemsOutput> {
+      
+    // 発行するクエリをログに出す
+    console.log(params);
+    
+    return this.dbContext.transactWrite(params).promise();
+  }
+
+  public async buildPutQuery(
+    condition: PutItemInputBase,
+  ): Promise<PutItemInput> {
+    const params: AWS.DynamoDB.DocumentClient.PutItemInput = {
+      TableName: this.tableName,
+      Item: condition.Item,
+    };
+
+    const newId = await this.getSequence();
+
+    params.Item = {
+      ...params.Item,
+      id: newId,
+      createdAt: DateTime.now().toMillis(),
+      updatedAt: DateTime.now().toMillis(),
+    };
+
+    return params;
+  }
+
+  public buildDeleteQuery(condition: DeleteItemInputBase): DeleteItemInput {
+    const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
+      TableName: this.tableName,
+      Key: condition.Key,
+    };
+
+    return params;
+  }
+
+  // 最新のシークエンス値を取得
+  // 各テーブルの最新のid値を採番する
+  // 若干雑な実装な気がするが一旦これで
+  public async getSequence(): Promise<string> {
+    const params = {
+      TableName: SEQUENCE_TABLE_NAME,
+      Key: { tableName: this.tableName },
+      UpdateExpression: `ADD #currentNumber :val`,
+      ExpressionAttributeNames: {
+        '#currentNumber': 'currentNumber',
+      },
+      ExpressionAttributeValues: {
+        ':val': 1,
+      },
+      ReturnValues: 'UPDATED_NEW',
+    };
+
+    console.log('getSequence', params);
+
+    const updateItemOutput = await this.dbContext.update(params).promise();
+    // if (updateItemOutput.Attributes?.currentNumber === undefined) {
+    //   throw '最新のid取得に失敗しました。';
+    // }
+
+    return String(updateItemOutput?.Attributes?.currentNumber || 0);
+    // return String(updateItemOutput.Attributes.currentNumber);
+  }
 
   /**
    * エンティティ取得
@@ -307,33 +367,5 @@ export abstract class RepositoryBase<
     Object.assign(params, condition);
 
     return params;
-  }
-
-  // 最新のシークエンス値を取得
-  // 各テーブルの最新のid値を採番する
-  // 若干雑な実装な気がするが一旦これで
-  private async getNewSequence(): Promise<string> {
-    const params = {
-      TableName: SEQUENCE_TABLE_NAME,
-      Key: { tableName: this.tableName },
-      UpdateExpression: `ADD #currentNumber :val`,
-      ExpressionAttributeNames: {
-        '#currentNumber': "currentNumber",
-      },
-      ExpressionAttributeValues: {
-        ':val': 1,
-      },
-      ReturnValues: 'UPDATED_NEW',
-    };
-
-    console.log(params)
-
-    const updateItemOutput = await this.dbContext.update(params).promise();
-    // if (updateItemOutput.Attributes?.currentNumber === undefined) {
-    //   throw '最新のid取得に失敗しました。';
-    // }
-
-    return String(updateItemOutput?.Attributes?.currentNumber || 0);
-    // return String(updateItemOutput.Attributes.currentNumber);
   }
 }
