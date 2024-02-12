@@ -76,7 +76,7 @@ export abstract class RepositoryBase<
     Object.assign(params, condition);
 
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("getAsync", params);
 
     // データ取得
     const output = await this.dbContext.get(params).promise();
@@ -96,7 +96,7 @@ export abstract class RepositoryBase<
       this.createQueryParameters(condition);
 
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("queryAsync", params);
 
     // コレクション
     const collection = this.createCollection();
@@ -148,7 +148,7 @@ export abstract class RepositoryBase<
       this.createScanParameters(condition);
 
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("scanAllAsync", params);
 
     // コレクション
     const collection = this.createCollection();
@@ -202,7 +202,7 @@ export abstract class RepositoryBase<
     const params = await this.buildPutQuery(condition);
 
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("putAsync", params);
     // データ追加
     return this.dbContext.put(params).promise();
   }
@@ -225,7 +225,7 @@ export abstract class RepositoryBase<
     Object.assign(params, condition);
 
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("updateAsync", params);
 
     // 更新
     return this.dbContext.update(params).promise();
@@ -249,7 +249,7 @@ export abstract class RepositoryBase<
     Object.assign(params, condition);
 
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("deleteAsync", params);
 
     // 削除
     return this.dbContext.delete(params).promise();
@@ -260,7 +260,7 @@ export abstract class RepositoryBase<
     ): Promise<TransactWriteItemsOutput> {
       
     // 発行するクエリをログに出す
-    console.log(params);
+    console.log("transactWriteAsync", params);
     
     return this.dbContext.transactWrite(params).promise();
   }
