@@ -1,12 +1,22 @@
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
-import { functionUserDetail, functionUserUpdate } from '../../lambda/users';
+import { functionUserAccountCreate, functionUserDetail, functionUserUpdate } from '../../lambda/users';
 import { RouteMapping } from '../routes';
 import { IamRoles } from '../../iamRole';
 
 export const resourceNameUser = 'users'
 
 export const defineApiGatewayUser = (scope: Construct, route: RouteMapping, iamRoles: IamRoles): void => {
+  route.apiUsers.addMethod(
+    'POST',
+    new LambdaIntegration(functionUserAccountCreate(scope, iamRoles.lambdaBasicRole)),
+    {
+      requestValidatorOptions: {
+        validateRequestParameters: true,
+      },
+    }
+  );
+
   route.apiUser.addMethod(
     'GET',
     new LambdaIntegration(functionUserDetail(scope, iamRoles.lambdaBasicRole)),

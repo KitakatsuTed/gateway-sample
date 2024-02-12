@@ -1,7 +1,7 @@
 jest.mock('src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
 }));
-import { handler } from 'src/functions/userAccounts/create/handler';
+import { handler } from 'src/functions/users/create/handler';
 import * as RegistrationServiceModule from 'src/lib/services/useCases/registrationService';
 import { STATUS_CODE } from 'src/lib/http/statusCode';
 import { RegistrationService } from 'src/lib/services/useCases/registrationService';

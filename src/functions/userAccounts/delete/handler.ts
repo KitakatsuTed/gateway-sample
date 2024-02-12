@@ -26,7 +26,7 @@ async function main(
 ): Promise<ResponseModel> {
   const deleteUserAccountService = new DeleteUserAccountService();
   await deleteUserAccountService.execute({
-    userAccountId: request.pathParameters.id,
+    userId: request.pathParameters.id,
   });
 
   return {
