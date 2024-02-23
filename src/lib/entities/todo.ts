@@ -25,6 +25,16 @@ export class Todo extends EntityBase {
     this.updatedAt = updatedAt;
   }
 
+  getKey(): Record<
+    string, 
+    any // eslint-disable-line @typescript-eslint/no-explicit-any
+  > {
+    return {
+      userId: this.userId,
+      createdAt: this.createdAt
+    }
+  }
+
   validate() {
     if (this.title && this.title.length > 100) {
       this.errors.push({ title: '100文字以上は入力できません' });

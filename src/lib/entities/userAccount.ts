@@ -18,6 +18,16 @@ export class UserAccount extends EntityBase {
     this.updatedAt = updatedAt;
   }
 
+  // eslint-disable-line @typescript-eslint/no-explicit-any
+  getKey(): Record<
+    string,
+    any // eslint-disable-line @typescript-eslint/no-explicit-any
+  > {
+    return {
+      userId: this.userId,
+    }
+  }
+
   validate() {
     // check presence
     const requiredAttrs: (keyof UserAccount)[] = [

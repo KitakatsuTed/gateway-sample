@@ -101,37 +101,50 @@ export function DynamodbAccessable<
         delete attrs.id;
         delete attrs.createdAt;
         delete attrs.errors;
+        // シンプルもしくは複合キーに設定した属性値は更新不可なので弾く
+        Object.keys(entity.getKey()).forEach((key) => {
+          delete attrs[key]
+        })
 
-        const ExpressionAttributeNames = Object.fromEntries(
-          Object.keys(attrs).map((key) => [`#${key}`, key]),
-        );
-        const ExpressionAttributeValues = Object.fromEntries(
-          Object.keys(attrs).map((key) => [`:${key}`, attrs[key]]),
-        );
+        let updateExpressionForSet = 'SET ';
+        let updateExpressionForRemove = 'REMOVE ';
+        const expressionAttributeNames: [string, string][] = [];
+        const expressionAttributeValues: [string, string][] = [];
 
-        // 基本的に数が合わないことはないが合っていなければ、想定外の更新結果になるので弾いておく
-        if (
-          Object.keys(ExpressionAttributeNames).length !==
-          Object.keys(ExpressionAttributeValues).length
-        ) {
-          throw `更新Queryの発行に失敗しました。ExpressionAttributeNamesとExpressionAttributeValuesのkey数が合いません。\nExpressionAttributeNames: ${ExpressionAttributeNames} ExpressionAttributeValues: ${ExpressionAttributeValues}`;
-        }
-        let UpdateExpression = 'SET ';
+        Object.entries(attrs).forEach(([key, value]) => {
+          expressionAttributeNames.push([`#${key}`, key])
+          
+          if (value !== undefined) {
+            updateExpressionForSet += `#${key} = :${key}, `
+            expressionAttributeValues.push([`:${key}`, attrs[key]])
+          } else {
+            updateExpressionForRemove += `#${key}, `
+          }
+        })
 
-        for (let i = 0; i < Object.keys(ExpressionAttributeNames).length; i++) {
-          UpdateExpression = UpdateExpression.concat(
-            `${Object.keys(ExpressionAttributeNames)[i]} = ${
-              Object.keys(ExpressionAttributeValues)[i]
-            }, `,
-          );
-        }
+        // const ExpressionAttributeNames = Object.fromEntries(
+        //   Object.keys(attrs).map((key) => [`#${key}`, key]),
+        // );
+        // const ExpressionAttributeValues = Object.fromEntries(
+        //   Object.keys(attrs).map((key) => [`:${key}`, attrs[key]]),
+        // );
+
         // 最後のカンマとスペースを削除
-        UpdateExpression = UpdateExpression.slice(0, -2);
+        let updateExpression = '';
+        if (updateExpressionForSet !== 'SET ') {
+          updateExpressionForSet = updateExpressionForSet.slice(0, -2);
+          updateExpression = updateExpression + updateExpressionForSet
+        }
+        
+        if (updateExpressionForRemove !== 'REMOVE ') {
+          updateExpressionForRemove = updateExpressionForRemove.slice(0, -2);
+          updateExpression = updateExpression + ' ' + updateExpressionForRemove
+        }
 
         return {
-          UpdateExpression,
-          ExpressionAttributeNames,
-          ExpressionAttributeValues,
+          UpdateExpression: updateExpression,
+          ExpressionAttributeNames: Object.fromEntries(expressionAttributeNames),
+          ExpressionAttributeValues: Object.fromEntries(expressionAttributeValues),
         };
       };
 
@@ -140,7 +153,7 @@ export function DynamodbAccessable<
       const condition = {
         ...{
           Key: {
-            id: entity.id,
+            ...entity.getKey()
           },
           ...buildDefaultUpdateQuery(entity),
         },
@@ -168,7 +181,7 @@ export function DynamodbAccessable<
 
       const condition = {
         Key: {
-          id: entity.id,
+          ...entity.getKey()
         },
       } as unknown as DeleteItemInputBase;
 

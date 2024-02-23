@@ -14,7 +14,7 @@ export class DeleteUserService {
     const user = await userService.findBy({ id: params.userId });
 
     const userAccount = await userAccountService.findBy({
-      id: user?.id,
+      userId: user?.id,
     });
 
     if (user === undefined || userAccount === undefined) {

@@ -79,7 +79,8 @@ export class UserService extends DynamodbAccessable(
 
 この時createやupdateなどDB操作のクエリの場合は、内部で自動的にバリデーションをコールする。なお、バリデーションはEntityクラスで実装することになります。バリデーションに失敗した場合は、Entityクラスのerrorsプロパティにエラー内容がセットされます。
 
-createやupdateのDB操作系については操作内容はEntityクラスのプロパティ値がそのままDynamoDBに反映されるイメージ感になります。(name:string, age:numberとかならこの2つがDBのカラムとして保存される)
+createやupdateのDB操作系については操作内容はEntityクラスのプロパティ値とEntityの規定クラスで定義されている、id、createdAt、updatedAtがそのままDynamoDBに反映されるイメージ感になります。(name:string, age:numberとかならこの2つがDBのカラムとして保存される)
+idは自動採番、createdAtは保存時の時間、updatedAtは更新時の時間が自動で保存されるようになります。
 
 つまりEntityクラスのプロパティ値がそのままテーブルスキーマとして定義される前提になります。(DynamoDBはスキーマレスが売りですが、それでもある程度のスキーマがあると嬉しいはず)
 
@@ -98,4 +99,4 @@ createやupdateのDB操作系については操作内容はEntityクラスのプ
 
 4. 他にも色々実装する
 
-すでに実装されているuser、todoなどを参考に作成すると良いです。
+すでに実装されているuser、todoなどを参考に作成すると良いです。また、ミックスインしたくない場合は、そのまま自前での実装が可能です。

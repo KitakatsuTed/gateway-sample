@@ -5,7 +5,7 @@ export class ErrorMessageMapping {
     this.mapping[400] = 'Bad Request';
     this.mapping[401] = 'Unauthorized';
     this.mapping[403] = 'Forbidden';
-    this.mapping[404] = 'Bad';
+    this.mapping[404] = 'Not Found';
     this.mapping[422] = 'Unprocessable Entity';
     this.mapping[429] = 'Too Many Requests';
     this.mapping[500] = 'Internal Server Error';

@@ -3,6 +3,7 @@ import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
 import { TodoService } from '../../../lib/services/todoService';
+import { QueryInputBase } from 'src/lib/dynamodb/conditions';
 
 export const eventSchema = {
   type: 'object',
@@ -29,9 +30,9 @@ async function main(
   const todos = await todoService.queryAsync({
     KeyConditionExpression: 'userId = :userId',
     ExpressionAttributeValues: {
-      ':userId': { S: request.pathParameters.userId },
+      ':userId': request.pathParameters.userId,
     },
-  });
+  } as unknown as QueryInputBase); // 型定義のままに実装するとDynamoDB側でエラーを吐くので無理やりキャストする
 
   return {
     statusCode: STATUS_CODE.OK,

@@ -26,6 +26,16 @@ export class User extends EntityBase {
 
   static saltRound: number = 10;
 
+  // eslint-disable-line @typescript-eslint/no-explicit-any
+  getKey(): Record<
+    string,
+    any // eslint-disable-line @typescript-eslint/no-explicit-any
+  > {
+    return {
+      id: this.id,
+    }
+  }
+
   validate() {
     // check presence
     const requiredAttrs: (keyof User)[] = ['name', 'status', 'age'];

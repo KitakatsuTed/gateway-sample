@@ -17,6 +17,7 @@ export class TodoRepository extends RepositoryBase<Entity, Collection> {
     // ここはitemのプロパティの型とEntityのinterfaceの型が同じであることをチェックしたい
     return new Entity(
       item.id,
+      item.userId,
       item.status,
       item.title,
       item.describe,

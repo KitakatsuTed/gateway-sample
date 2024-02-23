@@ -1,11 +1,5 @@
-export class NotFoundException extends Error {
-  /**
-   * コンストラクタ
-   * @param message メッセージ
-   */
-  constructor(message?: string) {
-    super(message);
+import { HttpBaseException } from "./HttpBaseException";
 
-    this.name = 'NotFoundException';
-  }
+export class NotFoundException extends HttpBaseException {
+  statusCode() { return 404 }
 }

@@ -10,7 +10,7 @@ export const buildUserAccountsTable = (scope: Construct) => {
     ...defaultOptions,
     tableName: USER_ACCOUNTS_TABLE_NAME,
     partitionKey: { //パーティションキーの定義
-      name: 'id',
+      name: 'userId',
       type: dynamodb.AttributeType.STRING,
     },
   });

@@ -26,6 +26,7 @@ export abstract class EntityBase implements IEntityBase {
   }
 
   abstract validate(): boolean;
+  abstract getKey(): Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
   idPersisted(): boolean {
     return !!this.id;

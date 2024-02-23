@@ -2,7 +2,7 @@ import { ErrorMessageMapping } from './ErrorMessageMapping';
 
 // https://go-to-k.hatenablog.com/entry/typescript-custom-error-class
 export abstract class HttpBaseException extends Error {
-  abstract statusCode: number;
+  abstract statusCode(): number;
 
   // 一部middy@http-error-handlerのプロパティに合わせている
   constructor(
@@ -16,12 +16,11 @@ export abstract class HttpBaseException extends Error {
   }
 
   private describeMessage() {
-    const statusCode = this.statusCode;
     const errorType = this.constructor.name;
     const errorMessage = `${this.getMessageByErrorCode()}: ${this.message}`;
     const details = this.details;
 
-    console.error('StatusCode: ' + `${statusCode}`);
+    console.error('StatusCode: ' + `${this.statusCode()}`);
     console.error('ErrorType: ' + errorType);
     console.error('ErrorMessage: ' + errorMessage);
     console.error('Details: ' + details);
@@ -31,6 +30,6 @@ export abstract class HttpBaseException extends Error {
     // メンバ変数にしてコンストラクタ内での初期化などもOK
     const errorMessageMapping = new ErrorMessageMapping();
 
-    return errorMessageMapping.getErrorMessage(this.statusCode);
+    return errorMessageMapping.getErrorMessage(this.statusCode());
   }
 }
