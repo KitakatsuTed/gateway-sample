@@ -1,30 +1,30 @@
 jest.mock('src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
 }));
-import { handler } from 'src/functions/userAccounts/delete/handler';
-import * as DeleteUserAccountServiceModule from 'src/lib/services/useCases/deleteUserAccountService';
+import { handler } from 'src/functions/users/delete/handler';
+import * as DeleteUserServiceModule from 'src/lib/services/useCases/deleteUserService';
 import { STATUS_CODE } from 'src/lib/http/statusCode';
 
 describe('handler', () => {
-  const deleteUserAccountService = new DeleteUserAccountServiceModule.DeleteUserAccountService()
-  const spyOnDeleteUserAccountService = jest.spyOn(DeleteUserAccountServiceModule, 'DeleteUserAccountService').mockImplementation(() => deleteUserAccountService)
-  const spyOnExecute = jest.spyOn(deleteUserAccountService, 'execute').mockResolvedValue(undefined)
+  const deleteUserService = new DeleteUserServiceModule.DeleteUserService()
+  const spyOnDeleteUserService = jest.spyOn(DeleteUserServiceModule, 'DeleteUserService').mockImplementation(() => deleteUserService)
+  const spyOnExecute = jest.spyOn(deleteUserService, 'execute').mockResolvedValue(undefined)
   
   afterEach(() => {
-    spyOnDeleteUserAccountService.mockReset();
+    spyOnDeleteUserService.mockReset();
     spyOnExecute.mockReset();
   });
 
   it('正常系', async () => {
     const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       pathParameters: {
-        id: 'id',
+        userId: 'id',
       }
     }
     const actual = await handler.handler(event)
 
     expect(spyOnExecute).toHaveBeenCalledWith({
-      userAccountId: 'id',
+      userId: 'id',
     })
     expect(actual).toEqual({
       statusCode: STATUS_CODE.NO_CONTENT,

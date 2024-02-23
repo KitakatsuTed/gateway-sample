@@ -2,6 +2,8 @@ import { UserAccount } from 'src/lib/entities/userAccount';
 import { UserAccountService } from '../userAccountService';
 import { UnprocessableEntityException } from 'src/lib/exceptions/UnprocessableEntityException';
 import { NotFoundException } from 'src/lib/exceptions/NotFoundException';
+import bcrypt from 'bcryptjs';
+import { User } from 'src/lib/entities/user';
 
 interface IUpdateUserAccountParams {
   userAccountId: string;
@@ -28,9 +30,11 @@ export class UpdateUserAccountService {
       );
     }
 
+    const hashedPassword = await bcrypt.hash(params.password, User.saltRound)
+
     userAccount.assignAttribute({
       email: params.email,
-      password: params.password,
+      password: hashedPassword,
     });
 
     const res = await userAccountService.update(userAccount);

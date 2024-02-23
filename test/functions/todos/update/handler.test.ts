@@ -17,6 +17,7 @@ describe('handler', () => {
 
   const todo = new Todo(
     '1',
+    'userId',
     'done',
     'title',
     'describe',
@@ -40,7 +41,8 @@ describe('handler', () => {
   test('正常系', async () => {
     const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       pathParameters: {
-        id: '1'
+        userId: 'userId',
+        createdAt: now.minus({ days: 2 }).toMillis(),
       },
       body: {
         status: 'incomplete',
@@ -57,6 +59,7 @@ describe('handler', () => {
         data:
           new Todo(
             '1',
+            'userId',
             'incomplete',
             'updated title',
             'updated describe',

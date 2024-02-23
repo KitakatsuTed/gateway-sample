@@ -1,4 +1,4 @@
-import { defaultOptions } from "./shared/defautlOptions";
+import { defaultOptions } from "./shared/defaultOptions";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
@@ -8,14 +8,10 @@ export const USERS_TABLE_NAME = 'users'
 export const buildUsersTable = (scope: Construct) => {
   new dynamodb.Table(scope, 'users-table', {
     ...defaultOptions,
-    tableName: USERS_TABLE_NAME, 
+    tableName: USERS_TABLE_NAME,
     partitionKey: { //パーティションキーの定義
       name: 'id',
       type: dynamodb.AttributeType.STRING,
     },
-    // sortKey: { // ソートキーの定義
-    //   name: 'createdAt',
-    //   type: dynamodb.AttributeType.NUMBER,
-    // },
   });
 } 

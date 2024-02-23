@@ -1,14 +1,14 @@
-import { defaultOptions } from "./shared/defautlOptions";
+import { defaultOptions } from "./shared/defaultOptions";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
 // テーブル名の定義
 export const USER_ACCOUNTS_TABLE_NAME = 'userAccounts'
 
-export const buildUsersTable = (scope: Construct) => {
+export const buildUserAccountsTable = (scope: Construct) => {
   const table = new dynamodb.Table(scope, 'user-accounts-table', {
     ...defaultOptions,
-    tableName: USER_ACCOUNTS_TABLE_NAME, 
+    tableName: USER_ACCOUNTS_TABLE_NAME,
     partitionKey: { //パーティションキーの定義
       name: 'id',
       type: dynamodb.AttributeType.STRING,
@@ -18,8 +18,8 @@ export const buildUsersTable = (scope: Construct) => {
   table.addGlobalSecondaryIndex(
     {
       indexName: 'email-password-index',
-      partitionKey: {name: 'email', type: dynamodb.AttributeType.STRING},
-      sortKey: {name: 'password', type: dynamodb.AttributeType.STRING},
+      partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'password', type: dynamodb.AttributeType.STRING },
     }
   )
   return table

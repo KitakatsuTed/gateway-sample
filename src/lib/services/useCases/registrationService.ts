@@ -4,6 +4,7 @@ import { UnprocessableEntityException } from 'src/lib/exceptions/UnprocessableEn
 import { UserService } from '../userService';
 import { User } from 'src/lib/entities/user';
 import { UserStatus } from '../../entities/user';
+import bcrypt from 'bcryptjs';
 
 interface IRegistrationParams {
   name: string;
@@ -25,6 +26,8 @@ export class RegistrationService {
       throw new UnprocessableEntityException('確認用のパスワードが違います');
     }
 
+    const hashedPassword = await bcrypt.hash(params.password, User.saltRound)
+
     const user = new User(
       undefined,
       params.name,
@@ -38,7 +41,7 @@ export class RegistrationService {
     const userAccount = new UserAccount(
       undefined,
       params.email,
-      params.password,
+      hashedPassword,
       userPutQuery.Item.id as string,
     );
     this.validate(userAccount);

@@ -2,7 +2,7 @@ import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
-import { DeleteUserAccountService } from 'src/lib/services/useCases/deleteUserAccountService';
+import { DeleteUserService } from 'src/lib/services/useCases/deleteUserService';
 
 export const eventSchema = {
   type: 'object',
@@ -10,11 +10,11 @@ export const eventSchema = {
     pathParameters: {
       type: 'object',
       properties: {
-        id: {
+        userId: {
           type: 'string',
         },
       },
-      required: ['id'],
+      required: ['userId'],
     },
   },
   required: ['pathParameters'],
@@ -24,9 +24,9 @@ export const eventSchema = {
 async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
-  const deleteUserAccountService = new DeleteUserAccountService();
-  await deleteUserAccountService.execute({
-    userId: request.pathParameters.id,
+  const deleteUserService = new DeleteUserService();
+  await deleteUserService.execute({
+    userId: request.pathParameters.userId,
   });
 
   return {

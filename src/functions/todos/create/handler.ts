@@ -9,7 +9,15 @@ import { UnprocessableEntityException } from '../../../lib/exceptions/Unprocessa
 export const eventSchema = {
   type: 'object',
   properties: {
-    pathParameters: {},
+    pathParameters: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+        },
+      },
+      required: ['userId'],
+    },
     body: {
       type: 'object',
       properties: {
@@ -27,7 +35,7 @@ export const eventSchema = {
       required: ['status'],
     },
   },
-  required: ['body'],
+  required: ['body', 'pathParameters'],
 } as const;
 
 // request: eventSchema.property で型付けされている。
@@ -37,6 +45,7 @@ async function main(
   // idに当たる引数をundefinedにするのはちょっと気持ち悪いけど、idは第一引数にいて欲しいので我慢する
   const todo = new Todo(
     undefined,
+    request.pathParameters.userId,
     request.body.status,
     request.body.title,
     request.body.describe,

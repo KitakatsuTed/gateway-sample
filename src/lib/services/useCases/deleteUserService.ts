@@ -7,7 +7,7 @@ interface IDeleteUserAccountParams {
 }
 
 // 確認用メールの送信なども含めそうなのでServiceクラスとして実装する
-export class DeleteUserAccountService {
+export class DeleteUserService {
   public async execute(params: IDeleteUserAccountParams): Promise<void> {
     const userAccountService = new UserAccountService();
     const userService = new UserService();

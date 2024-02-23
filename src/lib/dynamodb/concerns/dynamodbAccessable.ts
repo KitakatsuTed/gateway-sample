@@ -106,7 +106,7 @@ export function DynamodbAccessable<
           Object.keys(attrs).map((key) => [`#${key}`, key]),
         );
         const ExpressionAttributeValues = Object.fromEntries(
-          Object.keys(attrs).map((key) => [`:${key}`, key]),
+          Object.keys(attrs).map((key) => [`:${key}`, attrs[key]]),
         );
 
         // 基本的に数が合わないことはないが合っていなければ、想定外の更新結果になるので弾いておく

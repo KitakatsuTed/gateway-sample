@@ -6,6 +6,7 @@ import * as UpdateUserAccountServiceModule from 'src/lib/services/useCases/updat
 import { STATUS_CODE } from 'src/lib/http/statusCode';
 import { UpdateUserAccountService } from 'src/lib/services/useCases/updateUserAccountService';
 import { UserAccount } from 'src/lib/entities/userAccount';
+import bcrypt from 'bcryptjs';
 
 describe('handler', () => {
   const userAccount = new UserAccount(
@@ -18,15 +19,18 @@ describe('handler', () => {
   const spyOnUpdateUserAccountService = jest.spyOn(UpdateUserAccountServiceModule, 'UpdateUserAccountService').mockImplementation(() => updateUserAccountService)
   const spyOnExecute = jest.spyOn(updateUserAccountService, 'execute').mockResolvedValue(userAccount)
 
+  const spyOnHash = jest.spyOn(bcrypt, "hash").mockImplementation(() => "hashed password")
+
   afterEach(() => {
     spyOnUpdateUserAccountService.mockReset();
+    spyOnHash.mockReset();
     spyOnExecute.mockReset();
   });
 
   it('正常系', async () => {
     const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       pathParameters: {
-        id: 'id',
+        userId: 'id',
       },
       body: {
         email: 'test@example.com',

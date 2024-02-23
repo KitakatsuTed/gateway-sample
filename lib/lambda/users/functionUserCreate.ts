@@ -1,15 +1,15 @@
 import { Construct } from "constructs";
-import { resourceNameUserAccount } from '../../apiGateway/userAccounts';
+import { resourceNameUser } from '../../apiGateway/users';
 import { defaultOptions } from '../shared/defaultOptions';
 import * as cdk from 'aws-cdk-lib';
 import path from "path";
-export const functionUserAccountCreate = (scope: Construct, iamRole: cdk.aws_iam.Role) => {
-  const functionNameUserAccountCreate = `${resourceNameUserAccount}Create`
+export const functionUserCreate = (scope: Construct, iamRole: cdk.aws_iam.Role) => {
+  const functionNameUserCreate = `${resourceNameUser}Create`
 
-  return new cdk.aws_lambda_nodejs.NodejsFunction(scope, functionNameUserAccountCreate, {
+  return new cdk.aws_lambda_nodejs.NodejsFunction(scope, functionNameUserCreate, {
     ...defaultOptions,
-    functionName: functionNameUserAccountCreate,
+    functionName: functionNameUserCreate,
     role: iamRole,
-    entry: path.join(__dirname, '../../../src/functions/userAccounts/create/handler.ts')
+    entry: path.join(__dirname, '../../../src/functions/users/create/handler.ts')
   });
 }

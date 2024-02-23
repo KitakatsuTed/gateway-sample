@@ -1,4 +1,4 @@
-import { defaultOptions } from "./shared/defautlOptions";
+import { defaultOptions } from "./shared/defaultOptions";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 

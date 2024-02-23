@@ -4,6 +4,7 @@ import { Status, Todo } from "src/lib/entities/todo"
 describe('validate', () => {
   const todo = new Todo(
     "id",
+    "userId",
     undefined as unknown as Status,
     "titletitletitletitletitletitletitletitletitletitletitletitletitletitletitletitletitletitletitletitlea",
     "describe",

@@ -2,7 +2,7 @@ import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
 import { RouteMapping } from '../routes';
 import { IamRoles } from '../../iamRole';
-import { functionUserAccountDelete, functionUserAccountUpdate } from '../../lambda/userAccounts';
+import { functionUserAccountUpdate } from '../../lambda/userAccounts';
 
 export const resourceNameUserAccount = 'userAccount'
 
@@ -12,20 +12,7 @@ export const defineApiGatewayUserAccount = (scope: Construct, route: RouteMappin
     new LambdaIntegration(functionUserAccountUpdate(scope, iamRoles.lambdaBasicRole)),
     {
       requestParameters: {
-        'method.request.path.id': true,
-      },
-      requestValidatorOptions: {
-        validateRequestParameters: true,
-      },
-    }
-  );
-
-  route.apiUserAccount.addMethod(
-    'DELETE',
-    new LambdaIntegration(functionUserAccountDelete(scope, iamRoles.lambdaBasicRole)),
-    {
-      requestParameters: {
-        'method.request.path.id': true,
+        'method.request.path.userId': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,

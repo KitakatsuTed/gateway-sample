@@ -17,6 +17,7 @@ describe('handler', () => {
   todoCollection.add(
     new Todo(
       '1',
+      'userId',
       'done',
       'title',
       'describe',
@@ -28,14 +29,16 @@ describe('handler', () => {
   const todoRepository = new TodoRepositoryModule.TodoRepository(dynamodbClient)
   const spyTodoRepository = jest.spyOn(TodoRepositoryModule, 'TodoRepository').mockImplementation(() => todoRepository)
   const mockedTodoRepository = jest.mocked(todoRepository)
-  mockedTodoRepository.scanAllAsync.mockResolvedValue(todoCollection)
+  mockedTodoRepository.queryAsync.mockResolvedValue(todoCollection)
 
   afterEach(() => {
     spyTodoRepository.mockReset();
   });
 
   const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-    "body": {}
+    pathParameters: {
+      userId: 'userId'
+    }
   }
 
   test('正常系', async () => {

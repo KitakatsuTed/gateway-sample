@@ -11,11 +11,14 @@ export const eventSchema = {
     pathParameters: {
       type: 'object',
       properties: {
-        id: {
+        userId: {
           type: 'string',
         },
+        createdAt: {
+          type: 'number',
+        },
       },
-      required: ['id'],
+      required: ['userId', 'createdAt'],
     },
   },
   required: ['pathParameters'],
@@ -28,11 +31,14 @@ async function main(
   const todoService = new TodoService();
 
   // 自前で実装したい人はgetAsyncを直接使えば良い
-  const todo = await todoService.findBy({ id: request.pathParameters.id });
+  const todo = await todoService.findBy({ 
+    userId: request.pathParameters.userId,
+    createdAt: request.pathParameters.createdAt,
+  });
 
   if (todo === undefined) {
     throw new NotFoundException(
-      `Couldn't find Todo with ${request.pathParameters.id}`,
+      `Couldn't find Todo with ${request.pathParameters.todoId}`,
     );
   }
 

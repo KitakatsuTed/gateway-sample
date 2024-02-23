@@ -11,11 +11,11 @@ export const eventSchema = {
     pathParameters: {
       type: 'object',
       properties: {
-        id: {
+        userId: {
           type: 'string',
         },
       },
-      required: ['id'],
+      required: ['userId'],
     },
   },
   required: ['pathParameters'],
@@ -28,11 +28,11 @@ async function main(
   const userService = new UserService();
 
   // 自前で実装したい人はgetAsyncを直接使えば良い
-  const user = await userService.findBy({ id: request.pathParameters.id });
+  const user = await userService.findBy({ id: request.pathParameters.userId });
 
   if (user === undefined) {
     throw new NotFoundException(
-      `Couldn't find User with ${request.pathParameters.id}`,
+      `Couldn't find User with ${request.pathParameters.userId}`,
     );
   }
 

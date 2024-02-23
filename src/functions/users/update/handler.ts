@@ -12,11 +12,11 @@ export const eventSchema = {
     pathParameters: {
       type: 'object',
       properties: {
-        id: {
+        userId: {
           type: 'string',
         },
       },
-      required: ['id'],
+      required: ['userId'],
     },
     body: {
       type: 'object',
@@ -42,11 +42,11 @@ async function main(
   request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
   const userService = new UserService();
-  const user = await userService.findBy({ id: request.pathParameters.id });
+  const user = await userService.findBy({ id: request.pathParameters.userId });
 
   if (user === undefined) {
     throw new NotFoundException(
-      `Couldn't find User with ${request.pathParameters.id}`,
+      `Couldn't find User with ${request.pathParameters.userId}`,
     );
   }
 

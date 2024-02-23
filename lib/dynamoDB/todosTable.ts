@@ -1,4 +1,4 @@
-import { defaultOptions } from "./shared/defautlOptions";
+import { defaultOptions } from "./shared/defaultOptions";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
@@ -8,14 +8,14 @@ export const TODOS_TABLE_NAME = 'todos'
 export const buildTodosTable = (scope: Construct) => {
   new dynamodb.Table(scope, 'todos-table', {
     ...defaultOptions,
-    tableName: TODOS_TABLE_NAME, 
+    tableName: TODOS_TABLE_NAME,
     partitionKey: { //パーティションキーの定義
-      name: 'id',
+      name: 'userId',
       type: dynamodb.AttributeType.STRING,
     },
-    // sortKey: { // ソートキーの定義
-    //   name: 'createdAt',
-    //   type: dynamodb.AttributeType.NUMBER,
-    // },
+    sortKey: {
+      name: 'createdAt',
+      type: dynamodb.AttributeType.NUMBER,
+    }
   });
 } 

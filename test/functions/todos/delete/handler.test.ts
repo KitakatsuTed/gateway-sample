@@ -16,6 +16,7 @@ describe('handler', () => {
 
   const todo = new Todo(
     '1',
+    'userId',
     'done',
     'title',
     'describe',
@@ -38,7 +39,8 @@ describe('handler', () => {
 
   const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
     pathParameters: {
-      id: '1'
+      createdAt: now.minus({ days: 2 }).toMillis(),
+      userId: 'userId'
     },
   }
 

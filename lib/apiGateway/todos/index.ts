@@ -27,7 +27,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     {
       requestParameters: {
         'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
-        'method.request.path.id': true,
+        'method.request.path.todoId': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,
@@ -54,7 +54,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     {
       requestParameters: {
         'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
-        'method.request.path.id': true,
+        'method.request.path.todoId': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,
@@ -68,7 +68,7 @@ export const defineApiGatewayTodo = (scope: Construct, route: RouteMapping, iamR
     {
       requestParameters: {
         'method.request.path.userId': true, // https://www.codewithyou.com/blog/validating-request-parameters-and-body-in-amazon-api-gateway-with-aws-cdk
-        'method.request.path.id': true,
+        'method.request.path.todoId': true,
       },
       requestValidatorOptions: {
         validateRequestParameters: true,

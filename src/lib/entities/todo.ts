@@ -7,6 +7,7 @@ export type Status = 'incomplete' | 'done';
 export class Todo extends EntityBase {
   constructor(
     public id: string | undefined,
+    public userId: string,
     public status: Status,
     public title?: string,
     public describe?: string,
@@ -15,6 +16,7 @@ export class Todo extends EntityBase {
     public updatedAt?: number | undefined,
   ) {
     super(id, createdAt, updatedAt);
+    this.userId = userId;
     this.status = status;
     this.title = title;
     this.describe = describe;
@@ -29,7 +31,7 @@ export class Todo extends EntityBase {
     }
 
     // check presence
-    const requiredAttrs: (keyof Todo)[] = ['status'];
+    const requiredAttrs: (keyof Todo)[] = ['status', 'userId'];
     requiredAttrs.forEach((attr) => {
       if (!this[attr]) {
         this.errors.push({ [attr]: '入力してください' });

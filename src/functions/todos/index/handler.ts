@@ -1,17 +1,37 @@
-import { eventDefaultSchema } from '../../../lib/middleware/middy/eventSchema';
 import { FromSchema } from 'json-schema-to-ts';
 import { middyfy } from '../../../lib/middleware/middy/middify';
 import { ResponseModel } from '../../../lib/middleware/middy/ResponseModel';
 import { STATUS_CODE } from '../../../lib/http/statusCode';
 import { TodoService } from '../../../lib/services/todoService';
 
+export const eventSchema = {
+  type: 'object',
+  properties: {
+    pathParameters: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+        },
+      },
+      required: ['userId'],
+    },
+  },
+  required: ['pathParameters'],
+} as const;
+
 // request: eventSchema.property で型付けされている。
 async function main(
-  _request: FromSchema<typeof eventDefaultSchema>,
+  request: FromSchema<typeof eventSchema>,
 ): Promise<ResponseModel> {
   const todoService = new TodoService();
 
-  const todos = await todoService.scanAllAsync({});
+  const todos = await todoService.queryAsync({
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': { S: request.pathParameters.userId },
+    },
+  });
 
   return {
     statusCode: STATUS_CODE.OK,
@@ -25,6 +45,6 @@ async function main(
 
 // これがexportされるhandler
 export const handler = middyfy({
-  eventSchema: eventDefaultSchema,
+  eventSchema: eventSchema,
   handler: main,
 });

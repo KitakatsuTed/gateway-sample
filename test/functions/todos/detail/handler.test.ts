@@ -13,6 +13,7 @@ jest.mock("src/lib/repositories/todoRepository.ts")
 describe('handler', () => {
   const todo = new Todo(
     '1',
+    'userId',
     'done',
     'title',
     'describe',
@@ -30,7 +31,10 @@ describe('handler', () => {
   });
 
   const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
-    "pathParameters": '1'
+    pathParameters: {
+      userId: 'userId',
+      createdAt: DateTime.now().toMillis(),
+    }
   }
 
   test('正常系', async () => {

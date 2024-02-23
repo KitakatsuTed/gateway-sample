@@ -1,4 +1,4 @@
-import { DeleteUserAccountService } from "src/lib/services/useCases/deleteUserAccountService";
+import { DeleteUserService } from "src/lib/services/useCases/deleteUserService";
 import { UserAccountService } from "src/lib/services/userAccountService";
 import { UserService } from "src/lib/services/userService";
 import * as UserAccountServiceModule from "src/lib/services/userAccountService"
@@ -12,7 +12,7 @@ jest.mock('src/lib/middleware/middy/middify.ts', () => ({
 }));
 
 describe('handler', () => {
-  const deleteUserAccountService = new DeleteUserAccountService()
+  const deleteUserService = new DeleteUserService()
   const userAccountService = new UserAccountService();
   const userService = new UserService();
   const user = new User(
@@ -45,8 +45,8 @@ describe('handler', () => {
   });
 
   it('正常系', async () => {
-    await deleteUserAccountService.execute({
-      userAccountId: userAccount.id as string
+    await deleteUserService.execute({
+      userId: userAccount.id as string
     })
 
     expect(spyOnTransactWrite).toHaveBeenCalledWith({

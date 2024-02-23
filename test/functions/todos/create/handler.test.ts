@@ -35,11 +35,13 @@ describe('handler', () => {
 
   test('正常系', async () => {
     const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      pathParameters: {
+        userId: "id"
+      },
       body: {
         status: 'incomplete',
         title: 'title',
         describe: 'describe',
-        doneAt: now.toMillis(),
       }
     }
     const actual = await handler.handler(event)
@@ -50,6 +52,7 @@ describe('handler', () => {
         data:
           new Todo(
             '1',
+            'id',
             'incomplete',
             'title',
             'describe',
@@ -63,6 +66,9 @@ describe('handler', () => {
 
   test('バリデーションエラー', async () => {
     const event: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
+      pathParameters: {
+        userId: "id"
+      },
       body: {
         status: 'incomplete',
         title: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',

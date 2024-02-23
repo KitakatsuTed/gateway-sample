@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 import { UserAccount } from "src/lib/entities/userAccount";
 import { UpdateUserAccountService } from "src/lib/services/useCases/updateUserAccountService";
 import { UnprocessableEntityException } from "src/lib/exceptions/UnprocessableEntityException";
-import { NotFoundException } from "src/lib/exceptions/NotFoundException";
+import bcrypt from 'bcryptjs';
 
 jest.mock('src/lib/middleware/middy/middify.ts', () => ({
   middyfy: jest.fn((handler) => handler),
@@ -31,9 +31,12 @@ describe('handler', () => {
   const spyOnUserAccountService = jest.spyOn(UserAccountServiceModule, 'UserAccountService').mockImplementation(() => userAccountService)
   const spyOnUpdateAsync = jest.spyOn(userAccountRepository, "updateAsync").mockResolvedValue({})
 
+  const spyOnHash = jest.spyOn(bcrypt, "hash").mockImplementation(() => "hashed password")
+
   afterEach(() => {
     spyOnUserAccountService.mockReset();
     spyOnUpdateAsync.mockReset();
+    spyOnHash.mockReset();
     spyNow.mockReset();
   });
 
@@ -55,7 +58,7 @@ describe('handler', () => {
       expect(res).toEqual(new UserAccount(
         "id",
         "updated@example.com",
-        "updated password",
+        "hashed password",
         "userId",
         DateTime.local(2024, 1, 30).toMillis(),
         now.toMillis(),

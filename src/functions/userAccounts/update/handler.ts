@@ -10,11 +10,11 @@ export const eventSchema = {
     pathParameters: {
       type: 'object',
       properties: {
-        id: {
+        userId: {
           type: 'string',
         },
       },
-      required: ['id'],
+      required: ['userId'],
     },
     body: {
       type: 'object',
@@ -41,7 +41,7 @@ async function main(
 ): Promise<ResponseModel> {
   const updateUserAccountService = new UpdateUserAccountService();
   const userAccount = await updateUserAccountService.execute({
-    userAccountId: request.pathParameters.id,
+    userAccountId: request.pathParameters.userId,
     email: request.body.email,
     password: request.body.password,
     passwordConfirmation: request.body.passwordConfirmation,

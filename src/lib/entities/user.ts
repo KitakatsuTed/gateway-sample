@@ -24,6 +24,8 @@ export class User extends EntityBase {
     this.updatedAt = updatedAt;
   }
 
+  static saltRound: number = 10;
+
   validate() {
     // check presence
     const requiredAttrs: (keyof User)[] = ['name', 'status', 'age'];
