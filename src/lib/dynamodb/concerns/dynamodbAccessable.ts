@@ -4,6 +4,7 @@ import {
   DeleteItemInputBase,
   UpdateItemInputBase,
   PutItemInputBase,
+  QueryInputBase,
 } from '../conditions';
 import { CollectionBase } from '../collections/collectionBase';
 import { RepositoryBase } from '../repositories/repositoryBase';
@@ -37,6 +38,24 @@ export function DynamodbAccessable<
       } as GetItemInputBase;
 
       return await this.repository.getAsync(condition);
+    }
+
+    async findAllBy(
+      params: Record<string, AWS.DynamoDB.DocumentClient.AttributeValue>,
+      opt?: Omit<QueryInputBase, 'KeyConditionExpression' | 'ExpressionAttributeValues' | 'ExpressionAttributeNames'>
+    ) {
+      let keyConditionExpression = ''
+      const expressionAttributeValues: [string, AttributeValue][] = []
+      Object.entries(params).forEach(([key, value]) => {
+        keyConditionExpression = keyConditionExpression + `${key} = :${key}, `
+        expressionAttributeValues.push([`:${key}`, value])
+      })
+
+      const condition = {
+        KeyConditionExpression: keyConditionExpression.slice(0, -2),
+        ExpressionAttributeValues: Object.fromEntries(expressionAttributeValues)
+        , ...opt}
+      return await this.repository.queryAsync(condition);
     }
 
     async create(
@@ -122,13 +141,6 @@ export function DynamodbAccessable<
           }
         })
 
-        // const ExpressionAttributeNames = Object.fromEntries(
-        //   Object.keys(attrs).map((key) => [`#${key}`, key]),
-        // );
-        // const ExpressionAttributeValues = Object.fromEntries(
-        //   Object.keys(attrs).map((key) => [`:${key}`, attrs[key]]),
-        // );
-
         // 最後のカンマとスペースを削除
         let updateExpression = '';
         if (updateExpressionForSet !== 'SET ') {
@@ -148,8 +160,6 @@ export function DynamodbAccessable<
         };
       };
 
-      // 抽象化しているのでas unknown as TConditionは使わず型ガードしたかったが一旦as unknown as TConditionで対応
-      // conditionのプロパティがオーバーライドなどで不適切になってもDynamo SDK側のエラーになるだけなので誤ったデータが入ることはないので割り切る
       const condition = {
         ...{
           Key: {
@@ -157,7 +167,7 @@ export function DynamodbAccessable<
           },
           ...buildDefaultUpdateQuery(entity),
         },
-      } as unknown as UpdateItemInputBase;
+      } as UpdateItemInputBase;
 
       // 自前のConditionがあれば優先
       const response = await this.repository.updateAsync(
@@ -183,7 +193,7 @@ export function DynamodbAccessable<
         Key: {
           ...entity.getKey()
         },
-      } as unknown as DeleteItemInputBase;
+      } as DeleteItemInputBase;
 
       return await this.repository.deleteAsync(condition);
     }
@@ -231,7 +241,9 @@ export function DynamodbAccessable<
 
     buildDeleteQuery(entity: TEntity): DeleteItemInput {
       const condition: DeleteItemInputBase = {
-        Key: { id: entity.id as unknown as AttributeValue },
+        Key: {
+          ...entity.getKey()
+        },
       };
 
       const deleteItemInput = this.repository.buildDeleteQuery(condition);

@@ -27,12 +27,9 @@ async function main(
 ): Promise<ResponseModel> {
   const todoService = new TodoService();
 
-  const todos = await todoService.queryAsync({
-    KeyConditionExpression: 'userId = :userId',
-    ExpressionAttributeValues: {
-      ':userId': request.pathParameters.userId,
-    },
-  } as unknown as QueryInputBase); // 型定義のままに実装するとDynamoDB側でエラーを吐くので無理やりキャストする
+  const todos = await todoService.findAllBy({
+    userId: request.pathParameters.userId
+  });
 
   return {
     statusCode: STATUS_CODE.OK,

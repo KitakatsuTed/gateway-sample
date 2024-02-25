@@ -75,7 +75,15 @@ export class UserService extends DynamodbAccessable(
 
 3. 利用する
 
-定義が済んだらあとは呼び出すだけ、Todoリソースならこんな感じでEntityクラスのインスタンスを用意して同じServiceクラスの関数に渡す。
+定義が済んだらあとは呼び出すだけです。拡張されたServiceクラスは以下の関数が使えるようになります。
+
+- findBy(データ取得)
+- findAllBy(コレクション取得)
+- create(データ作成)
+- update(データ更新)
+- delete(データ削除)
+
+Todoリソースならこんな感じでEntityクラスのインスタンスを用意して同じServiceクラスの関数に渡す。
 
 この時createやupdateなどDB操作のクエリの場合は、内部で自動的にバリデーションをコールする。なお、バリデーションはEntityクラスで実装することになります。バリデーションに失敗した場合は、Entityクラスのerrorsプロパティにエラー内容がセットされます。
 
@@ -84,7 +92,26 @@ idは自動採番、createdAtは保存時の時間、updatedAtは更新時の時
 
 つまりEntityクラスのプロパティ値がそのままテーブルスキーマとして定義される前提になります。(DynamoDBはスキーマレスが売りですが、それでもある程度のスキーマがあると嬉しいはず)
 
+#### findBy(データ取得)
+```typescript
+  const todoService = new TodoService();
+  const todo = await todoService.findBy({ 
+    userId: request.pathParameters.userId,
+    createdAt: request.pathParameters.createdAt,
+  });
 ```
+
+#### findAllBy(コレクション取得)
+```typescript
+  const todoService = new TodoService();
+
+  const todos = await todoService.findAllBy({
+    userId: request.pathParameters.userId
+  });
+```
+
+#### create(データ作成)
+```typescript
   const todo = new Todo(
     undefined,
     request.pathParameters.userId,
@@ -96,6 +123,38 @@ idは自動採番、createdAtは保存時の時間、updatedAtは更新時の時
   const todoService = new TodoService();
   const res = await todoService.create(todo);
 ```
+
+#### update(データ更新)
+```typescript
+  const todoService = new TodoService();
+  const todo = await todoService.findBy({ 
+    userId: request.pathParameters.userId,
+    createdAt: request.pathParameters.createdAt,
+   });
+
+  todo.assignAttribute({
+  title: request.body.title,
+  describe: request.body.describe,
+  status: request.body.status,
+  doneAt: request.body.doneAt
+    ? DateTime.fromISO(request.body.doneAt).toMillis()
+    : undefined,
+  });
+  await todoService.update(todo);
+```
+
+#### delete(データ削除)
+```typescript
+  const todoService = new TodoService();
+
+  const todo = await todoService.findBy({ 
+    userId: request.pathParameters.userId,
+    createdAt: request.pathParameters.createdAt,
+  });
+
+  await todoService.delete(todo);
+```
+
 
 4. 他にも色々実装する
 
